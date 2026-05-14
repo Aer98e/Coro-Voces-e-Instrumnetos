@@ -1,0 +1,7 @@
+Metadatos cargados del CSV: 38 himnos
+No se pudo parsear: audios\A la Sombra de la Cruz - Piano 1.3.mp3
+No se pudo parsear: audios\Aun de Noche - WithMetronome.mp3
+No se pudo parsear: partituras\Al Mundo Mandame - Melodia con Acordes.pdf
+Archivos de audio válidos detectados: 188
+Archivos de partituras válidos detectados: 145
+data.json generado con 38 himnos

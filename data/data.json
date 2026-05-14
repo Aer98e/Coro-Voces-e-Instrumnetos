@@ -1,0 +1,1398 @@
+[
+  {
+    "id": 1,
+    "titulo": "A la Sombra de La Cruz",
+    "categorias": [
+      "para repaso",
+      "para campaña - mayo"
+    ],
+    "tono": "Fa mayor",
+    "versiones": [
+      {
+        "voz": "Soprano",
+        "audio": "audios/A la Sombra de la Cruz - Soprano.mp3",
+        "pdf": "partituras/A la Sombra de La Cruz - Soprano.pdf"
+      },
+      {
+        "voz": "Alto",
+        "audio": "audios/A la Sombra de la Cruz - Alto.mp3",
+        "pdf": "partituras/A la Sombra de La Cruz - Alto.pdf"
+      },
+      {
+        "voz": "Tenor",
+        "audio": "audios/A la Sombra de la Cruz - Tenor.mp3",
+        "pdf": "partituras/A la Sombra de La Cruz - Tenor.pdf"
+      },
+      {
+        "voz": "Bajo",
+        "audio": "audios/A la Sombra de la Cruz - Bajo.mp3",
+        "pdf": "partituras/A la Sombra de La Cruz - Bajo.pdf"
+      },
+      {
+        "voz": "Score SATB",
+        "audio": "audios/A la Sombra de la Cruz - Score SATB.mp3",
+        "pdf": "partituras/A la Sombra de La Cruz - Score SATB.pdf"
+      }
+    ],
+    "fecha_registro": "2024-08-05"
+  },
+  {
+    "id": 2,
+    "titulo": "Al Mundo Mandame",
+    "categorias": [
+      "general"
+    ],
+    "tono": "Sib menor",
+    "versiones": [
+      {
+        "voz": "Soprano",
+        "audio": "audios/Al Mundo Mandame - Soprano.mp3",
+        "pdf": "partituras/Al Mundo Mandame - Soprano.pdf"
+      },
+      {
+        "voz": "Alto",
+        "audio": "audios/Al Mundo Mandame - Alto.mp3",
+        "pdf": "partituras/Al Mundo Mandame - Alto.pdf"
+      },
+      {
+        "voz": "Tenor",
+        "audio": "audios/Al Mundo Mandame - Tenor.mp3",
+        "pdf": "partituras/Al Mundo Mandame - Tenor.pdf"
+      },
+      {
+        "voz": "Bajo",
+        "audio": "audios/Al Mundo Mandame - Bajo.mp3",
+        "pdf": "partituras/Al Mundo Mandame - Bajo.pdf"
+      },
+      {
+        "voz": "Score SATB",
+        "audio": "audios/Al Mundo Mandame - Score SATB.mp3",
+        "pdf": ""
+      }
+    ],
+    "fecha_registro": "2025-10-07"
+  },
+  {
+    "id": 3,
+    "titulo": "Al Señor Seamos Fieles",
+    "categorias": [
+      "general"
+    ],
+    "tono": "Lab mayor",
+    "versiones": [
+      {
+        "voz": "Soprano",
+        "audio": "audios/Al Señor Seamos Fieles - Soprano.mp3",
+        "pdf": "partituras/Al Señor Seamos Fieles - Soprano.pdf"
+      },
+      {
+        "voz": "Alto",
+        "audio": "audios/Al Señor Seamos Fieles - Alto.mp3",
+        "pdf": "partituras/Al Señor Seamos Fieles - Alto.pdf"
+      },
+      {
+        "voz": "Tenor",
+        "audio": "audios/Al Señor Seamos Fieles - Tenor.mp3",
+        "pdf": "partituras/Al Señor Seamos Fieles - Tenor.pdf"
+      },
+      {
+        "voz": "Bajo",
+        "audio": "audios/Al Señor Seamos Fieles - Bajo.mp3",
+        "pdf": "partituras/Al Señor Seamos Fieles - Bajo.pdf"
+      },
+      {
+        "voz": "Score SATB",
+        "audio": "audios/Al Señor Seamos Fieles - Score SATB.mp3",
+        "pdf": ""
+      }
+    ],
+    "fecha_registro": "2024-06-14"
+  },
+  {
+    "id": 4,
+    "titulo": "Aleluya Gloria a Cristo",
+    "categorias": [
+      "para repaso"
+    ],
+    "tono": "Fa mayor",
+    "versiones": [
+      {
+        "voz": "Soprano",
+        "audio": "audios/Aleluya Gloria a Cristo - Soprano.mp3",
+        "pdf": "partituras/Aleluya Gloria a Cristo - Soprano.pdf"
+      },
+      {
+        "voz": "Alto",
+        "audio": "audios/Aleluya Gloria a Cristo - Alto.mp3",
+        "pdf": "partituras/Aleluya Gloria a Cristo - Alto.pdf"
+      },
+      {
+        "voz": "Tenor",
+        "audio": "audios/Aleluya Gloria a Cristo - Tenor.mp3",
+        "pdf": "partituras/Aleluya Gloria a Cristo - Tenor.pdf"
+      },
+      {
+        "voz": "Bajo",
+        "audio": "audios/Aleluya Gloria a Cristo - Bajo.mp3",
+        "pdf": "partituras/Aleluya Gloria a Cristo - Bajo.pdf"
+      },
+      {
+        "voz": "Score SATB",
+        "audio": "audios/Aleluya Gloria a Cristo - Score SATB.mp3",
+        "pdf": "partituras/Aleluya Gloria a Cristo - Score SATB.pdf"
+      }
+    ],
+    "fecha_registro": "2024-09-20"
+  },
+  {
+    "id": 5,
+    "titulo": "Amor de Dios",
+    "categorias": [
+      "general"
+    ],
+    "tono": "Sol mayor",
+    "versiones": [
+      {
+        "voz": "Soprano",
+        "audio": "audios/Amor de Dios - Soprano.mp3",
+        "pdf": "partituras/Amor de Dios - Soprano.pdf"
+      },
+      {
+        "voz": "Alto",
+        "audio": "audios/Amor de Dios - Alto.mp3",
+        "pdf": "partituras/Amor de Dios - Alto.pdf"
+      },
+      {
+        "voz": "Tenor",
+        "audio": "audios/Amor de Dios - Tenor.mp3",
+        "pdf": "partituras/Amor de Dios - Tenor.pdf"
+      },
+      {
+        "voz": "Bajo",
+        "audio": "audios/Amor de Dios - Bajo.mp3",
+        "pdf": "partituras/Amor de Dios - Bajo.pdf"
+      },
+      {
+        "voz": "Score SATB",
+        "audio": "audios/amor de dios - Score SATB.mp3",
+        "pdf": "partituras/amor de dios - Score SATB.pdf"
+      },
+      {
+        "voz": "Piano",
+        "audio": "audios/Amor de Dios - Piano.mp3",
+        "pdf": ""
+      }
+    ],
+    "fecha_registro": "2026-04-23"
+  },
+  {
+    "id": 6,
+    "titulo": "Aun de Noche",
+    "categorias": [
+      "para repaso",
+      "para campaña - mayo"
+    ],
+    "tono": "Re mayor",
+    "versiones": [
+      {
+        "voz": "Soprano",
+        "audio": "audios/Aun de Noche - Soprano.mp3",
+        "pdf": "partituras/Aun de Noche - Soprano.pdf"
+      },
+      {
+        "voz": "Alto",
+        "audio": "audios/Aun de Noche - Alto.mp3",
+        "pdf": "partituras/Aun de Noche - Alto.pdf"
+      },
+      {
+        "voz": "Tenor",
+        "audio": "audios/Aun de Noche - Tenor.mp3",
+        "pdf": "partituras/Aun de Noche - Tenor.pdf"
+      },
+      {
+        "voz": "Bajo",
+        "audio": "audios/Aun de Noche - Bajo.mp3",
+        "pdf": "partituras/Aun de Noche - Bajo.pdf"
+      },
+      {
+        "voz": "Score SATB",
+        "audio": "audios/Aun de Noche - Score SATB.mp3",
+        "pdf": ""
+      },
+      {
+        "voz": "Piano",
+        "audio": "audios/Aun de Noche - Piano.mp3",
+        "pdf": "partituras/Aun de Noche - Piano.pdf"
+      },
+      {
+        "voz": "Solo",
+        "audio": "audios/Aun de Noche - Solo.mp3",
+        "pdf": "partituras/Aun de Noche - Solo.pdf"
+      }
+    ],
+    "fecha_registro": "2025-01-15"
+  },
+  {
+    "id": 7,
+    "titulo": "Cerca, mas Cerca",
+    "categorias": [
+      "general"
+    ],
+    "tono": "Reb mayor",
+    "versiones": [
+      {
+        "voz": "Soprano",
+        "audio": "audios/Cerca, mas Cerca - Soprano.mp3",
+        "pdf": ""
+      },
+      {
+        "voz": "Alto",
+        "audio": "audios/Cerca, mas Cerca - Alto.mp3",
+        "pdf": ""
+      },
+      {
+        "voz": "Tenor",
+        "audio": "audios/Cerca, mas Cerca - Tenor.mp3",
+        "pdf": ""
+      },
+      {
+        "voz": "Bajo",
+        "audio": "audios/Cerca, mas Cerca - Bajo.mp3",
+        "pdf": ""
+      },
+      {
+        "voz": "Score SATB",
+        "audio": "audios/Cerca, mas Cerca - Score SATB.mp3",
+        "pdf": "partituras/Cerca, mas Cerca - Score SATB.pdf"
+      }
+    ],
+    "fecha_registro": "2024-11-30"
+  },
+  {
+    "id": 8,
+    "titulo": "Contempla a Dios",
+    "categorias": [
+      "general"
+    ],
+    "tono": "Do mayor",
+    "versiones": [
+      {
+        "voz": "Soprano",
+        "audio": "audios/Contempla a Dios - Soprano.mp3",
+        "pdf": "partituras/Contempla a Dios - Soprano.pdf"
+      },
+      {
+        "voz": "Alto",
+        "audio": "audios/Contempla a Dios - Alto.mp3",
+        "pdf": "partituras/Contempla a Dios - Alto.pdf"
+      },
+      {
+        "voz": "Tenor",
+        "audio": "audios/Contempla a Dios - Tenor.mp3",
+        "pdf": "partituras/Contempla a Dios - Tenor.pdf"
+      },
+      {
+        "voz": "Bajo",
+        "audio": "audios/Contempla a Dios - Bajo.mp3",
+        "pdf": "partituras/Contempla a Dios - Bajo.pdf"
+      },
+      {
+        "voz": "Score SATB",
+        "audio": "audios/Contempla a Dios - Score SATB.mp3",
+        "pdf": ""
+      }
+    ],
+    "fecha_registro": "2025-02-08"
+  },
+  {
+    "id": 9,
+    "titulo": "Cordero de gloria",
+    "categorias": [
+      "general"
+    ],
+    "tono": "Sol menor",
+    "versiones": [
+      {
+        "voz": "Soprano",
+        "audio": "audios/Cordero de gloria - Soprano.mp3",
+        "pdf": "partituras/Cordero de gloria - Soprano.pdf"
+      },
+      {
+        "voz": "Alto",
+        "audio": "audios/Cordero de gloria - Alto.mp3",
+        "pdf": "partituras/Cordero de gloria - Alto.pdf"
+      },
+      {
+        "voz": "Tenor",
+        "audio": "audios/Cordero de gloria - Tenor.mp3",
+        "pdf": "partituras/Cordero de gloria - Tenor.pdf"
+      },
+      {
+        "voz": "Bajo",
+        "audio": "audios/Cordero de gloria - Bajo.mp3",
+        "pdf": "partituras/Cordero de gloria - Bajo.pdf"
+      },
+      {
+        "voz": "Score SATB",
+        "audio": "audios/Cordero de gloria - Score SATB.mp3",
+        "pdf": "partituras/Cordero de gloria - Score SATB.pdf"
+      }
+    ],
+    "fecha_registro": "2024-10-25"
+  },
+  {
+    "id": 10,
+    "titulo": "Cristo Sostendrá",
+    "categorias": [
+      "para repaso",
+      "para campaña - mayo"
+    ],
+    "tono": "La mayor",
+    "versiones": [
+      {
+        "voz": "Soprano",
+        "audio": "audios/Cristo Sostendrá - Soprano.mp3",
+        "pdf": "partituras/Cristo Sostendrá - Soprano.pdf"
+      },
+      {
+        "voz": "Alto",
+        "audio": "audios/Cristo Sostendrá - Alto.mp3",
+        "pdf": "partituras/Cristo Sostendrá - Alto.pdf"
+      },
+      {
+        "voz": "Tenor",
+        "audio": "audios/Cristo Sostendrá - Tenor.mp3",
+        "pdf": "partituras/Cristo Sostendrá - Tenor.pdf"
+      },
+      {
+        "voz": "Bajo",
+        "audio": "audios/Cristo Sostendrá - Bajo.mp3",
+        "pdf": "partituras/Cristo Sostendrá - Bajo.pdf"
+      },
+      {
+        "voz": "Score SATB",
+        "audio": "audios/Cristo Sostendrá - Score SATB.mp3",
+        "pdf": "partituras/Cristo Sostendrá - Score SATB.pdf"
+      }
+    ],
+    "fecha_registro": "2025-03-12"
+  },
+  {
+    "id": 11,
+    "titulo": "Cuan Grande es él",
+    "categorias": [
+      "general"
+    ],
+    "tono": "Sib mayor",
+    "versiones": [
+      {
+        "voz": "Soprano",
+        "audio": "audios/Cuan Grande es él - Soprano.mp3",
+        "pdf": ""
+      },
+      {
+        "voz": "Alto",
+        "audio": "audios/Cuan Grande es él - Alto.mp3",
+        "pdf": ""
+      },
+      {
+        "voz": "Tenor",
+        "audio": "audios/Cuan Grande es él - Tenor.mp3",
+        "pdf": ""
+      },
+      {
+        "voz": "Bajo",
+        "audio": "audios/Cuan Grande es él - Bajo.mp3",
+        "pdf": ""
+      },
+      {
+        "voz": "Score SATB",
+        "audio": "audios/Cuan Grande es él - Score SATB.mp3",
+        "pdf": "partituras/Cuan Grande es él - Score SATB.pdf"
+      }
+    ],
+    "fecha_registro": "2024-07-18"
+  },
+  {
+    "id": 12,
+    "titulo": "Digno de Honor",
+    "categorias": [
+      "para campaña - mayo",
+      "general"
+    ],
+    "tono": "Sol mayor",
+    "versiones": [
+      {
+        "voz": "Soprano",
+        "audio": "audios/Digno de Honor - Soprano.mp3",
+        "pdf": "partituras/Digno de Honor - Soprano.pdf"
+      },
+      {
+        "voz": "Alto",
+        "audio": "audios/Digno de Honor - Alto.mp3",
+        "pdf": "partituras/Digno de Honor - Alto.pdf"
+      },
+      {
+        "voz": "Tenor",
+        "audio": "audios/Digno de Honor - Tenor.mp3",
+        "pdf": "partituras/Digno de Honor - Tenor.pdf"
+      },
+      {
+        "voz": "Bajo",
+        "audio": "audios/Digno de Honor - Bajo.mp3",
+        "pdf": "partituras/Digno de Honor - Bajo.pdf"
+      },
+      {
+        "voz": "Score SATB",
+        "audio": "audios/Digno de Honor - Score SATB.mp3",
+        "pdf": ""
+      }
+    ],
+    "fecha_registro": "2025-04-05"
+  },
+  {
+    "id": 13,
+    "titulo": "El Profundo Amor de Cristo",
+    "categorias": [
+      "para campaña - mayo",
+      "para repaso"
+    ],
+    "tono": "Mi menor",
+    "versiones": [
+      {
+        "voz": "Soprano",
+        "audio": "audios/El Profundo Amor de Cristo - Soprano.mp3",
+        "pdf": "partituras/El Profundo Amor de Cristo - Soprano.pdf"
+      },
+      {
+        "voz": "Alto",
+        "audio": "audios/El Profundo Amor de Cristo - Alto.mp3",
+        "pdf": "partituras/El Profundo Amor de Cristo - Alto.pdf"
+      },
+      {
+        "voz": "Tenor",
+        "audio": "audios/El Profundo Amor de Cristo - Tenor.mp3",
+        "pdf": "partituras/El Profundo Amor de Cristo - Tenor.pdf"
+      },
+      {
+        "voz": "Bajo",
+        "audio": "audios/El Profundo Amor de Cristo - Bajo.mp3",
+        "pdf": "partituras/El Profundo Amor de Cristo - Bajo.pdf"
+      },
+      {
+        "voz": "Score SATB",
+        "audio": "audios/El Profundo Amor de Cristo - Score SATB.mp3",
+        "pdf": "partituras/El Profundo Amor de Cristo - Score SATB.pdf"
+      }
+    ],
+    "fecha_registro": "2024-12-10"
+  },
+  {
+    "id": 14,
+    "titulo": "Fue por MÍ",
+    "categorias": [
+      "para repaso",
+      "para campaña - mayo"
+    ],
+    "tono": "Sol menor",
+    "versiones": [
+      {
+        "voz": "Soprano",
+        "audio": "audios/Fue por Mí - Soprano.mp3",
+        "pdf": "partituras/Fue por MÍ - Soprano.pdf"
+      },
+      {
+        "voz": "Alto",
+        "audio": "audios/Fue por Mí - Alto.mp3",
+        "pdf": "partituras/Fue por MÍ - Alto.pdf"
+      },
+      {
+        "voz": "Tenor",
+        "audio": "audios/Fue por Mí - Tenor.mp3",
+        "pdf": "partituras/Fue por MÍ - Tenor.pdf"
+      },
+      {
+        "voz": "Bajo",
+        "audio": "audios/Fue por Mí - Bajo.mp3",
+        "pdf": "partituras/Fue por MÍ - Bajo.pdf"
+      },
+      {
+        "voz": "Score SATB",
+        "audio": "audios/Fue por Mí - Score SATB.mp3",
+        "pdf": "partituras/Fue por MÍ - Score SATB.pdf"
+      }
+    ],
+    "fecha_registro": "2025-05-22"
+  },
+  {
+    "id": 15,
+    "titulo": "La Noticia sin Igual",
+    "categorias": [
+      "navidad"
+    ],
+    "tono": "Re mayor",
+    "versiones": [
+      {
+        "voz": "Soprano",
+        "audio": "audios/La noticia sin igual - Soprano.mp3",
+        "pdf": "partituras/La Noticia sin Igual - Soprano.pdf"
+      },
+      {
+        "voz": "Alto",
+        "audio": "audios/La noticia sin igual - Alto.mp3",
+        "pdf": "partituras/La Noticia sin Igual - Alto.pdf"
+      },
+      {
+        "voz": "Tenor",
+        "audio": "audios/La noticia sin igual - Tenor.mp3",
+        "pdf": "partituras/La Noticia sin Igual - Tenor.pdf"
+      },
+      {
+        "voz": "Bajo",
+        "audio": "audios/La noticia sin igual - Bajo.mp3",
+        "pdf": "partituras/La Noticia sin Igual - Bajo.pdf"
+      },
+      {
+        "voz": "Score SATB",
+        "audio": "audios/La noticia sin igual - Score SATB.mp3",
+        "pdf": ""
+      }
+    ],
+    "fecha_registro": "2024-08-30"
+  },
+  {
+    "id": 16,
+    "titulo": "Manos Cariñosas",
+    "categorias": [
+      "general"
+    ],
+    "tono": "Desconocido",
+    "versiones": [
+      {
+        "voz": "Soprano",
+        "audio": "audios/Manos Cariñosas - Soprano.mp3",
+        "pdf": ""
+      },
+      {
+        "voz": "Alto",
+        "audio": "audios/Manos Cariñosas - Alto.mp3",
+        "pdf": ""
+      },
+      {
+        "voz": "Tenor",
+        "audio": "audios/Manos Cariñosas - Tenor.mp3",
+        "pdf": ""
+      },
+      {
+        "voz": "Score SATB",
+        "audio": "audios/Manos Cariñosas - Score SATB.mp3",
+        "pdf": ""
+      }
+    ],
+    "fecha_registro": "2024-09-14"
+  },
+  {
+    "id": 17,
+    "titulo": "Maravillosa Gracia",
+    "categorias": [
+      "para repaso",
+      "para campaña - mayo"
+    ],
+    "tono": "Do mayor",
+    "versiones": [
+      {
+        "voz": "Soprano",
+        "audio": "audios/Maravillosa Gracia - Soprano.mp3",
+        "pdf": "partituras/Maravillosa Gracia - Soprano.pdf"
+      },
+      {
+        "voz": "Alto",
+        "audio": "audios/Maravillosa Gracia - Alto.mp3",
+        "pdf": "partituras/Maravillosa Gracia - Alto.pdf"
+      },
+      {
+        "voz": "Tenor",
+        "audio": "audios/Maravillosa Gracia - Tenor.mp3",
+        "pdf": "partituras/Maravillosa Gracia - Tenor.pdf"
+      },
+      {
+        "voz": "Bajo",
+        "audio": "audios/Maravillosa Gracia - Bajo.mp3",
+        "pdf": "partituras/Maravillosa Gracia - Bajo.pdf"
+      },
+      {
+        "voz": "Score SATB",
+        "audio": "audios/Maravillosa Gracia - Score SATB.mp3",
+        "pdf": "partituras/Maravillosa Gracia - Score SATB.pdf"
+      }
+    ],
+    "fecha_registro": "2025-01-28"
+  },
+  {
+    "id": 18,
+    "titulo": "Maravilloso es el Gran Amor",
+    "categorias": [
+      "para repaso"
+    ],
+    "tono": "Sol mayor",
+    "versiones": [
+      {
+        "voz": "Soprano",
+        "audio": "audios/Maravilloso es el Gran Amor - Soprano.mp3",
+        "pdf": "partituras/Maravilloso es el Gran Amor - Soprano.pdf"
+      },
+      {
+        "voz": "Alto",
+        "audio": "audios/Maravilloso es el Gran Amor - Alto.mp3",
+        "pdf": "partituras/Maravilloso es el Gran Amor - Alto.pdf"
+      },
+      {
+        "voz": "Tenor",
+        "audio": "audios/Maravilloso es el Gran Amor - Tenor.mp3",
+        "pdf": "partituras/Maravilloso es el Gran Amor - Tenor.pdf"
+      },
+      {
+        "voz": "Bajo",
+        "audio": "audios/Maravilloso es el Gran Amor - Bajo.mp3",
+        "pdf": "partituras/Maravilloso es el Gran Amor - Bajo.pdf"
+      },
+      {
+        "voz": "Score SATB",
+        "audio": "audios/Maravilloso es el Gran Amor - Score SATB.mp3",
+        "pdf": "partituras/Maravilloso es el Gran Amor - Score SATB.pdf"
+      }
+    ],
+    "fecha_registro": "2024-10-06"
+  },
+  {
+    "id": 19,
+    "titulo": "No Cambiara",
+    "categorias": [
+      "para repaso",
+      "para campaña - mayo"
+    ],
+    "tono": "Mib mayor",
+    "versiones": [
+      {
+        "voz": "Soprano",
+        "audio": "audios/No Cambiara - Soprano.mp3",
+        "pdf": "partituras/No Cambiara - Soprano.pdf"
+      },
+      {
+        "voz": "Alto",
+        "audio": "audios/No Cambiara - Alto.mp3",
+        "pdf": "partituras/No Cambiara - Alto.pdf"
+      },
+      {
+        "voz": "Tenor",
+        "audio": "audios/No Cambiara - Tenor.mp3",
+        "pdf": "partituras/No Cambiara - Tenor.pdf"
+      },
+      {
+        "voz": "Bajo",
+        "audio": "audios/No Cambiara - Bajo.mp3",
+        "pdf": "partituras/No Cambiara - Bajo.pdf"
+      },
+      {
+        "voz": "Score SATB",
+        "audio": "audios/No Cambiara - Score SATB.mp3",
+        "pdf": ""
+      }
+    ],
+    "fecha_registro": "2025-02-19"
+  },
+  {
+    "id": 20,
+    "titulo": "Noche de Paz",
+    "categorias": [
+      "navidad"
+    ],
+    "tono": "Sib mayor",
+    "versiones": [
+      {
+        "voz": "Soprano",
+        "audio": "audios/Noche de Paz - Soprano.mp3",
+        "pdf": "partituras/Noche de Paz - Soprano.pdf"
+      },
+      {
+        "voz": "Alto",
+        "audio": "audios/Noche de Paz - Alto.mp3",
+        "pdf": "partituras/Noche de Paz - Alto.pdf"
+      },
+      {
+        "voz": "Tenor",
+        "audio": "audios/Noche de Paz - Tenor.mp3",
+        "pdf": "partituras/Noche de Paz - Tenor.pdf"
+      },
+      {
+        "voz": "Bajo",
+        "audio": "audios/Noche de Paz - Bajo.mp3",
+        "pdf": "partituras/Noche de Paz - Bajo.pdf"
+      },
+      {
+        "voz": "Score SATB",
+        "audio": "audios/Noche de Paz - Score SATB.mp3",
+        "pdf": ""
+      }
+    ],
+    "fecha_registro": "2024-11-15"
+  },
+  {
+    "id": 21,
+    "titulo": "Obra Maestra",
+    "categorias": [
+      "general"
+    ],
+    "tono": "Fa mayor",
+    "versiones": [
+      {
+        "voz": "Soprano",
+        "audio": "audios/Obra Maestra - Soprano.mp3",
+        "pdf": ""
+      },
+      {
+        "voz": "Alto",
+        "audio": "audios/Obra Maestra - Alto.mp3",
+        "pdf": ""
+      },
+      {
+        "voz": "Tenor",
+        "audio": "audios/Obra Maestra - Tenor.mp3",
+        "pdf": ""
+      },
+      {
+        "voz": "Bajo",
+        "audio": "audios/Obra Maestra - Bajo.mp3",
+        "pdf": ""
+      },
+      {
+        "voz": "Score SATB",
+        "audio": "audios/Obra Maestra - Score SATB.mp3",
+        "pdf": ""
+      }
+    ],
+    "fecha_registro": "2025-03-25"
+  },
+  {
+    "id": 22,
+    "titulo": "Oh ven, bendito Emanuel",
+    "categorias": [
+      "navidad"
+    ],
+    "tono": "Mi menor",
+    "versiones": [
+      {
+        "voz": "Soprano",
+        "audio": "audios/Oh ven, bendito Emanuel - Soprano.mp3",
+        "pdf": "partituras/Oh ven, bendito Emanuel - Soprano.pdf"
+      },
+      {
+        "voz": "Alto",
+        "audio": "audios/Oh ven, bendito Emanuel - Alto.mp3",
+        "pdf": "partituras/Oh ven, bendito Emanuel - Alto.pdf"
+      },
+      {
+        "voz": "Tenor",
+        "audio": "audios/Oh ven, bendito Emanuel - Tenor.mp3",
+        "pdf": "partituras/Oh ven, bendito Emanuel - Tenor.pdf"
+      },
+      {
+        "voz": "Bajo",
+        "audio": "audios/Oh ven, bendito Emanuel - Bajo.mp3",
+        "pdf": "partituras/Oh ven, bendito Emanuel - Bajo.pdf"
+      },
+      {
+        "voz": "Score SATB",
+        "audio": "audios/Oh ven, bendito Emanuel - Score SATB.mp3",
+        "pdf": "partituras/Oh ven, bendito Emanuel - Score SATB.pdf"
+      }
+    ],
+    "fecha_registro": "2024-12-01"
+  },
+  {
+    "id": 23,
+    "titulo": "Prefiero a Cristo",
+    "categorias": [
+      "para repaso",
+      "para campaña - mayo"
+    ],
+    "tono": "Do mayor >",
+    "versiones": [
+      {
+        "voz": "Soprano",
+        "audio": "audios/Prefiero a Cristo - Soprano.mp3",
+        "pdf": "partituras/Prefiero a Cristo - Soprano.pdf"
+      },
+      {
+        "voz": "Alto",
+        "audio": "audios/Prefiero a Cristo - Alto.mp3",
+        "pdf": "partituras/Prefiero a Cristo - Alto.pdf"
+      },
+      {
+        "voz": "Tenor",
+        "audio": "audios/Prefiero a Cristo - Tenor.mp3",
+        "pdf": "partituras/Prefiero a Cristo - Tenor.pdf"
+      },
+      {
+        "voz": "Bajo",
+        "audio": "audios/Prefiero a Cristo - Bajo.mp3",
+        "pdf": "partituras/Prefiero a Cristo - Bajo.pdf"
+      },
+      {
+        "voz": "Score SATB",
+        "audio": "audios/Prefiero a Cristo - Score SATB.mp3",
+        "pdf": "partituras/Prefiero a Cristo - Score SATB.pdf"
+      }
+    ],
+    "fecha_registro": "2025-04-10"
+  },
+  {
+    "id": 24,
+    "titulo": "Prefiero a Cristo - Cambio de Tono",
+    "categorias": [
+      "para repaso",
+      "para campaña - mayo"
+    ],
+    "tono": "Do mayor >",
+    "versiones": [
+      {
+        "voz": "Soprano",
+        "audio": "audios/Prefiero a Cristo - Cambio de Tono - Soprano.mp3",
+        "pdf": ""
+      },
+      {
+        "voz": "Alto",
+        "audio": "audios/Prefiero a Cristo - Cambio de Tono - Alto.mp3",
+        "pdf": ""
+      },
+      {
+        "voz": "Tenor",
+        "audio": "audios/Prefiero a Cristo - Cambio de Tono - Tenor.mp3",
+        "pdf": ""
+      },
+      {
+        "voz": "Bajo",
+        "audio": "audios/Prefiero a Cristo - Cambio de Tono - Bajo.mp3",
+        "pdf": ""
+      },
+      {
+        "voz": "Score SATB",
+        "audio": "audios/Prefiero a Cristo - Cambio de Tono - Score SATB.mp3",
+        "pdf": ""
+      }
+    ],
+    "fecha_registro": "2025-04-10"
+  },
+  {
+    "id": 25,
+    "titulo": "Prefiero a Cristo 3.0",
+    "categorias": [
+      "para repaso",
+      "para campaña - mayo"
+    ],
+    "tono": "Do mayor >",
+    "versiones": [
+      {
+        "voz": "Soprano",
+        "audio": "",
+        "pdf": "partituras/Prefiero a Cristo 3.0 - Soprano.pdf"
+      },
+      {
+        "voz": "Alto",
+        "audio": "",
+        "pdf": "partituras/Prefiero a Cristo 3.0 - Alto.pdf"
+      },
+      {
+        "voz": "Tenor",
+        "audio": "",
+        "pdf": "partituras/Prefiero a Cristo 3.0 - Tenor.pdf"
+      },
+      {
+        "voz": "Bajo",
+        "audio": "",
+        "pdf": "partituras/Prefiero a Cristo 3.0 - Bajo.pdf"
+      },
+      {
+        "voz": "Score SATB",
+        "audio": "",
+        "pdf": "partituras/Prefiero a Cristo 3.0 - Score SATB.pdf"
+      }
+    ],
+    "fecha_registro": "2025-04-15"
+  },
+  {
+    "id": 26,
+    "titulo": "Que bella historia",
+    "categorias": [
+      "general",
+      "para campaña - mayo"
+    ],
+    "tono": "Fa mayor",
+    "versiones": [
+      {
+        "voz": "Soprano",
+        "audio": "audios/Que bella historia - Soprano.mp3",
+        "pdf": "partituras/Que bella historia - Soprano.pdf"
+      },
+      {
+        "voz": "Alto",
+        "audio": "audios/Que bella historia - Alto.mp3",
+        "pdf": "partituras/Que bella historia - Alto.pdf"
+      },
+      {
+        "voz": "Tenor",
+        "audio": "audios/Que bella historia - Tenor.mp3",
+        "pdf": "partituras/Que bella historia - Tenor.pdf"
+      },
+      {
+        "voz": "Bajo",
+        "audio": "audios/Que bella historia - Bajo.mp3",
+        "pdf": "partituras/Que bella historia - Bajo.pdf"
+      },
+      {
+        "voz": "Score SATB",
+        "audio": "audios/Que bella historia - Score SATB.mp3",
+        "pdf": ""
+      }
+    ],
+    "fecha_registro": "2025-05-03"
+  },
+  {
+    "id": 27,
+    "titulo": "Regocijate en El",
+    "categorias": [
+      "general"
+    ],
+    "tono": "Mib mayor",
+    "versiones": [
+      {
+        "voz": "Soprano",
+        "audio": "audios/Regocijate en El - Soprano.mp3",
+        "pdf": "partituras/Regocijate en El - Soprano.pdf"
+      },
+      {
+        "voz": "Alto",
+        "audio": "audios/Regocijate en El - Alto.mp3",
+        "pdf": "partituras/Regocijate en El - Alto.pdf"
+      },
+      {
+        "voz": "Tenor",
+        "audio": "audios/Regocijate en El - Tenor.mp3",
+        "pdf": "partituras/Regocijate en El - Tenor.pdf"
+      },
+      {
+        "voz": "Bajo",
+        "audio": "audios/Regocijate en El - Bajo.mp3",
+        "pdf": "partituras/Regocijate en El - Bajo.pdf"
+      },
+      {
+        "voz": "Score SATB",
+        "audio": "audios/Regocijate en El - Score SATB.mp3",
+        "pdf": "partituras/Regocijate en El - Score SATB.pdf"
+      }
+    ],
+    "fecha_registro": "2024-09-27"
+  },
+  {
+    "id": 28,
+    "titulo": "Santa la Noche",
+    "categorias": [
+      "navidad"
+    ],
+    "tono": "Do mayor",
+    "versiones": [
+      {
+        "voz": "Soprano",
+        "audio": "audios/Santa la Noche - Soprano.mp3",
+        "pdf": "partituras/Santa la Noche - Soprano.pdf"
+      },
+      {
+        "voz": "Alto",
+        "audio": "audios/Santa la Noche - Alto.mp3",
+        "pdf": "partituras/Santa la Noche - Alto.pdf"
+      },
+      {
+        "voz": "Tenor",
+        "audio": "audios/Santa la Noche - Tenor.mp3",
+        "pdf": "partituras/Santa la Noche - Tenor.pdf"
+      },
+      {
+        "voz": "Bajo",
+        "audio": "audios/Santa la Noche - Bajo.mp3",
+        "pdf": "partituras/Santa la Noche - Bajo.pdf"
+      },
+      {
+        "voz": "Score SATB",
+        "audio": "audios/Santa la Noche - Score SATB.mp3",
+        "pdf": ""
+      },
+      {
+        "voz": "Piano",
+        "audio": "audios/Santa la noche - Piano.mp3",
+        "pdf": ""
+      }
+    ],
+    "fecha_registro": "2024-11-25"
+  },
+  {
+    "id": 29,
+    "titulo": "Santo, Santo, Santo",
+    "categorias": [
+      "general"
+    ],
+    "tono": "Re mayor",
+    "versiones": [
+      {
+        "voz": "Soprano",
+        "audio": "audios/Santo, Santo, Santo - Soprano.mp3",
+        "pdf": ""
+      },
+      {
+        "voz": "Alto",
+        "audio": "audios/Santo, Santo, Santo - Alto.mp3",
+        "pdf": ""
+      },
+      {
+        "voz": "Tenor",
+        "audio": "audios/Santo, Santo, Santo - Tenor.mp3",
+        "pdf": ""
+      },
+      {
+        "voz": "Bajo",
+        "audio": "audios/Santo, Santo, Santo - Bajo.mp3",
+        "pdf": ""
+      },
+      {
+        "voz": "Score SATB",
+        "audio": "audios/Santo, Santo, Santo - Score SATB.mp3",
+        "pdf": "partituras/Santo, Santo, Santo - Score SATB.pdf"
+      }
+    ],
+    "fecha_registro": "2024-08-05"
+  },
+  {
+    "id": 30,
+    "titulo": "Se Oye un Son en Alta Esfera",
+    "categorias": [
+      "navidad"
+    ],
+    "tono": "Fa mayor",
+    "versiones": [
+      {
+        "voz": "Soprano",
+        "audio": "audios/Se Oye un Son en Alta Esfera - Soprano.mp3",
+        "pdf": "partituras/Se Oye un Son en Alta Esfera - Soprano.pdf"
+      },
+      {
+        "voz": "Alto",
+        "audio": "audios/Se Oye un Son en Alta Esfera - Alto.mp3",
+        "pdf": "partituras/Se Oye un Son en Alta Esfera - Alto.pdf"
+      },
+      {
+        "voz": "Tenor",
+        "audio": "audios/Se Oye un Son en Alta Esfera - Tenor.mp3",
+        "pdf": "partituras/Se Oye un Son en Alta Esfera - Tenor.pdf"
+      },
+      {
+        "voz": "Bajo",
+        "audio": "audios/Se Oye un Son en Alta Esfera - Bajo.mp3",
+        "pdf": "partituras/Se Oye un Son en Alta Esfera - Bajo.pdf"
+      },
+      {
+        "voz": "Score SATB",
+        "audio": "audios/Se Oye un Son en Alta Esfera - Score SATB.mp3",
+        "pdf": ""
+      }
+    ],
+    "fecha_registro": "2025-02-14"
+  },
+  {
+    "id": 31,
+    "titulo": "Señor Jesús la Luz del Sol se Fue",
+    "categorias": [
+      "para repaso",
+      "para campaña - mayo"
+    ],
+    "tono": "Mib mayor",
+    "versiones": [
+      {
+        "voz": "Soprano",
+        "audio": "audios/Señor Jesús la Luz del Sol se Fue - Soprano.mp3",
+        "pdf": "partituras/Señor Jesús la Luz del Sol se Fue - Soprano.pdf"
+      },
+      {
+        "voz": "Alto",
+        "audio": "audios/Señor Jesús la Luz del Sol se Fue - Alto.mp3",
+        "pdf": "partituras/Señor Jesús la Luz del Sol se Fue - Alto.pdf"
+      },
+      {
+        "voz": "Tenor",
+        "audio": "audios/Señor Jesús la Luz del Sol se Fue - Tenor.mp3",
+        "pdf": "partituras/Señor Jesús la Luz del Sol se Fue - Tenor.pdf"
+      },
+      {
+        "voz": "Bajo",
+        "audio": "audios/Señor Jesús la Luz del Sol se Fue - Bajo.mp3",
+        "pdf": "partituras/Señor Jesús la Luz del Sol se Fue - Bajo.pdf"
+      },
+      {
+        "voz": "Score SATB",
+        "audio": "audios/señor jesús la luz del sol se fue - Score SATB.mp3",
+        "pdf": "partituras/Señor Jesús la Luz del Sol se Fue - Score SATB.pdf"
+      }
+    ],
+    "fecha_registro": "2025-03-30"
+  },
+  {
+    "id": 32,
+    "titulo": "Su manto por el mio",
+    "categorias": [
+      "para repaso",
+      "para campaña - mayo"
+    ],
+    "tono": "Re mayor",
+    "versiones": [
+      {
+        "voz": "Soprano",
+        "audio": "audios/Su manto por el mio - Soprano.mp3",
+        "pdf": "partituras/Su manto por el mio - Soprano.pdf"
+      },
+      {
+        "voz": "Alto",
+        "audio": "audios/Su manto por el mio - Alto.mp3",
+        "pdf": "partituras/Su manto por el mio - Alto.pdf"
+      },
+      {
+        "voz": "Tenor",
+        "audio": "audios/Su manto por el mio - Tenor.mp3",
+        "pdf": "partituras/Su manto por el mio - Tenor.pdf"
+      },
+      {
+        "voz": "Bajo",
+        "audio": "audios/Su manto por el mio - Bajo.mp3",
+        "pdf": "partituras/Su manto por el mio - Bajo.pdf"
+      },
+      {
+        "voz": "Score SATB",
+        "audio": "audios/Su manto por el mio - Score SATB.mp3",
+        "pdf": ""
+      }
+    ],
+    "fecha_registro": "2024-10-12"
+  },
+  {
+    "id": 33,
+    "titulo": "te loamos oh dios",
+    "categorias": [
+      "general"
+    ],
+    "tono": "Sol mayor",
+    "versiones": [
+      {
+        "voz": "Soprano",
+        "audio": "audios/Te loamos oh Dios - Soprano.mp3",
+        "pdf": ""
+      },
+      {
+        "voz": "Alto",
+        "audio": "audios/Te loamos oh Dios - Alto.mp3",
+        "pdf": ""
+      },
+      {
+        "voz": "Tenor",
+        "audio": "audios/Te loamos oh Dios - Tenor.mp3",
+        "pdf": ""
+      },
+      {
+        "voz": "Bajo",
+        "audio": "audios/Te loamos oh Dios - Bajo.mp3",
+        "pdf": ""
+      },
+      {
+        "voz": "Score SATB",
+        "audio": "audios/Te loamos oh Dios - Score SATB.mp3",
+        "pdf": "partituras/te loamos oh dios - Score SATB.pdf"
+      }
+    ],
+    "fecha_registro": "2025-06-01"
+  },
+  {
+    "id": 34,
+    "titulo": "Tengo ante el Trono",
+    "categorias": [
+      "para repaso"
+    ],
+    "tono": "Re mayor",
+    "versiones": [
+      {
+        "voz": "Soprano",
+        "audio": "audios/Tengo ante el Trono - Soprano.mp3",
+        "pdf": "partituras/Tengo ante el Trono - Soprano.pdf"
+      },
+      {
+        "voz": "Alto",
+        "audio": "audios/Tengo ante el Trono - Alto.mp3",
+        "pdf": "partituras/Tengo ante el Trono - Alto.pdf"
+      },
+      {
+        "voz": "Tenor",
+        "audio": "audios/Tengo ante el Trono - Tenor.mp3",
+        "pdf": "partituras/Tengo ante el Trono - Tenor.pdf"
+      },
+      {
+        "voz": "Bajo",
+        "audio": "audios/Tengo ante el Trono - Bajo.mp3",
+        "pdf": "partituras/Tengo ante el Trono - Bajo.pdf"
+      },
+      {
+        "voz": "Score SATB",
+        "audio": "audios/Tengo ante el Trono - Score SATB.mp3",
+        "pdf": ""
+      }
+    ],
+    "fecha_registro": "2025-01-09"
+  },
+  {
+    "id": 35,
+    "titulo": "Ven a las Aguas",
+    "categorias": [
+      "general"
+    ],
+    "tono": "Mib mayor",
+    "versiones": [
+      {
+        "voz": "Soprano",
+        "audio": "audios/Ven a las Aguas - Soprano.mp3",
+        "pdf": "partituras/Ven a las Aguas - Soprano.pdf"
+      },
+      {
+        "voz": "Alto",
+        "audio": "audios/Ven a las Aguas - Alto.mp3",
+        "pdf": "partituras/Ven a las Aguas - Alto.pdf"
+      },
+      {
+        "voz": "Tenor",
+        "audio": "audios/Ven a las Aguas - Tenor.mp3",
+        "pdf": "partituras/Ven a las Aguas - Tenor.pdf"
+      },
+      {
+        "voz": "Bajo",
+        "audio": "audios/Ven a las Aguas - Bajo.mp3",
+        "pdf": "partituras/Ven a las Aguas - Bajo.pdf"
+      },
+      {
+        "voz": "Score SATB",
+        "audio": "audios/Ven a las Aguas - Score SATB.mp3",
+        "pdf": ""
+      }
+    ],
+    "fecha_registro": "2025-02-26"
+  },
+  {
+    "id": 36,
+    "titulo": "Venid, Fieles Todos",
+    "categorias": [
+      "navidad"
+    ],
+    "tono": "Sol mayor",
+    "versiones": [
+      {
+        "voz": "Soprano",
+        "audio": "audios/Venid, Fieles Todos - Soprano.mp3",
+        "pdf": "partituras/Venid, Fieles Todos - Soprano.pdf"
+      },
+      {
+        "voz": "Alto",
+        "audio": "audios/Venid, Fieles Todos - Alto.mp3",
+        "pdf": "partituras/Venid, Fieles Todos - Alto.pdf"
+      },
+      {
+        "voz": "Tenor",
+        "audio": "audios/Venid, Fieles Todos - Tenor.mp3",
+        "pdf": "partituras/Venid, Fieles Todos - Tenor.pdf"
+      },
+      {
+        "voz": "Bajo",
+        "audio": "audios/Venid, Fieles Todos - Bajo.mp3",
+        "pdf": "partituras/Venid, Fieles Todos - Bajo.pdf"
+      },
+      {
+        "voz": "Score SATB",
+        "audio": "audios/Venid, Fieles Todos - Score SATB.mp3",
+        "pdf": ""
+      }
+    ],
+    "fecha_registro": "2024-12-20"
+  },
+  {
+    "id": 37,
+    "titulo": "Viste Tu",
+    "categorias": [
+      "para repaso",
+      "para campaña - mayo"
+    ],
+    "tono": "Mib mayor",
+    "versiones": [
+      {
+        "voz": "Soprano",
+        "audio": "audios/Viste Tu - Soprano.mp3",
+        "pdf": "partituras/Viste Tu - Soprano.pdf"
+      },
+      {
+        "voz": "Alto",
+        "audio": "audios/Viste Tu - Alto.mp3",
+        "pdf": "partituras/Viste Tu - Alto.pdf"
+      },
+      {
+        "voz": "Tenor",
+        "audio": "audios/Viste Tu - Tenor.mp3",
+        "pdf": "partituras/Viste Tu - Tenor.pdf"
+      },
+      {
+        "voz": "Bajo",
+        "audio": "audios/Viste Tu - Bajo.mp3",
+        "pdf": "partituras/Viste Tu - Bajo.pdf"
+      },
+      {
+        "voz": "Score SATB",
+        "audio": "audios/Viste Tu - Score SATB.mp3",
+        "pdf": "partituras/Viste Tu - Score SATB.pdf"
+      }
+    ],
+    "fecha_registro": "2025-04-08"
+  },
+  {
+    "id": 38,
+    "titulo": "Ángeles Cantando Están",
+    "categorias": [],
+    "tono": "",
+    "versiones": [
+      {
+        "voz": "Soprano",
+        "audio": "audios/Ángeles Cantando Están - Soprano.mp3",
+        "pdf": "partituras/Ángeles Cantando Están - Soprano.pdf"
+      },
+      {
+        "voz": "Alto",
+        "audio": "audios/Ángeles Cantando Están - Alto.mp3",
+        "pdf": "partituras/Ángeles Cantando Están - Alto.pdf"
+      },
+      {
+        "voz": "Tenor",
+        "audio": "audios/Ángeles Cantando Están - Tenor.mp3",
+        "pdf": "partituras/Ángeles Cantando Están - Tenor.pdf"
+      },
+      {
+        "voz": "Bajo",
+        "audio": "audios/Ángeles Cantando Están - Bajo.mp3",
+        "pdf": "partituras/Ángeles Cantando Están - Bajo.pdf"
+      },
+      {
+        "voz": "Score SATB",
+        "audio": "audios/Ángeles Cantando Están - Score SATB.mp3",
+        "pdf": ""
+      }
+    ],
+    "fecha_registro": "2025-11-07"
+  }
+]

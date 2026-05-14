@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Himnos – Audios y Partituras</title>
+  <link rel="stylesheet" href="styles.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="busqueda.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-content">
+      <h1 class="site-title">Himnos</h1>
+      <p class="site-subtitle">Audios de ensayo y partituras</p>
+    </div>
+  </header>
+
+  <main class="container main-layout">
+    <section class="search-panel">
+      <h2 class="section-title">Buscar</h2>
+
+      <label class="field-label" for="search-input">Título o número de himno</label>
+      <input
+        id="search-input"
+        type="text"
+        class="search-input"
+        placeholder="Ejemplo: Santo, Santo, Santo"
+      >
+
+      <div class="filters">
+        <div class="filter-group">
+          <label class="field-label" for="category-select">Categoría</label>
+          <select id="category-select" class="select-input">
+            <option value="">Todas</option>
+            <option value="himno">Himno</option>
+            <option value="especial">Especial</option>
+            <option value="navidad">Navidad</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label class="field-label" for="order-select">Ordenar por</label>
+          <select id="order-select" class="select-input">
+            <option value="titulo">Título</option>
+            <option value="reciente">Recientes</option>
+            <option value="antiguo">Agregados hace mucho</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <section class="results-panel">
+      <h2 class="section-title">Resultados</h2>
+      <p class="loading-message">Cargando himnos...</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-content">
+      <p>Proyecto de ensayos · Himnos y partituras</p>
+    </div>
+  </footer>
+</body>
+</html>
