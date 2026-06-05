@@ -31,7 +31,7 @@ document.getElementById("hymnForm").addEventListener("submit", function(e) {
     } else {
         // Nuevo registro (se añade en memoria)
         const dataArr = window.hymnsData || [];
-        const newId = dataArr.reduce((m, r) => Math.max(m, r.id || 0), 0) + 1;
+        const newId = dataArr.reduce((m, r) => Math.max(m, r.id || 0), 0) + 1;//De esto se encargará supabase en producción, pero para demo local asignamos un ID incremental
         payload.id = newId;
         dataArr.push(payload);
         window.hymnsData = dataArr;
@@ -43,7 +43,7 @@ document.getElementById("hymnForm").addEventListener("submit", function(e) {
     form.reset();
     document.getElementById('hymn_id').value = '';
     const _mt = document.getElementById('modal-title');
-    if (_mt) _mt.innerText = 'Agregar nuevo himno';
+    if (_mt) _mt.innerText = 'Agregar nuevo himno'; // Ahora presenta un error de que al editar y cerrar el cuadro no se limpia el formulario. (Buscar solución a esto)
     document.getElementById('save-btn').innerText = 'Guardar Himno';
     closeModal();
 });
