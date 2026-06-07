@@ -4,9 +4,8 @@
  */
 
 import { inputBusqueda, selectCategoria, selectOrden } from "./config/selectors.js";
-import { cargarHimnos } from "./services/hymnService.js";
+import { cargarHimnos, cargarCategoriasUnicas } from "./services/hymnService.js";
 import {
-  obtenerCategoriasUnicas,
   filtrarHimnos,
   ordenarHimnos
 } from "./domain/hymn.js";
@@ -36,8 +35,10 @@ function actualizar() {
  */
 async function inicializar() {
   try {
+    // Cargar himnos y categorías desde Supabase
     himnos = await cargarHimnos();
-    const categorias = obtenerCategoriasUnicas(himnos);
+    const categorias = await cargarCategoriasUnicas();
+    
     renderizarCategorias(categorias);
     actualizar();
   } catch (error) {

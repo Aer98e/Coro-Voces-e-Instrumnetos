@@ -4,23 +4,8 @@
  */
 
 /**
- * Extrae todas las categorías únicas de una lista de himnos
- * @param {Array} lista - Lista de himnos
- * @returns {Array} Array de categorías únicas ordenadas
- */
-export function obtenerCategoriasUnicas(lista) {
-  const todas = lista.flatMap(himno => {
-    const categorias = himno.categorias ?? himno.categoria;
-    if (Array.isArray(categorias)) {
-      return categorias.filter(Boolean);
-    }
-    return categorias ? [categorias] : [];
-  });
-  return Array.from(new Set(todas)).sort();
-}
-
-/**
- * Obtiene las categorías de un himno específico
+ * Obtiene las categorías de un himno
+ * Las categorías ya vienen populadas desde Supabase
  * @param {Object} himno - Objeto himno
  * @returns {Array} Array de categorías del himno
  */
@@ -53,6 +38,32 @@ export function obtenerVersionPorVoz(himno, voz) {
 }
 
 /**
+ * Normaliza un texto eliminando tildes/diacríticos y comas, convirtiendo a minúsculas
+ * @param {string} str - Texto a normalizar
+ * @returns {string} Texto normalizado
+ */
+function normalizarTexto(str) {
+  return String(str ?? "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "") // Remueve tildes y diacríticos
+    .replace(/,/g, "")               // Remueve comas
+    .trim();
+}
+
+/**
+ * Limpia un título para ordenar alfabéticamente ignorando signos de puntuación comunes
+ * @param {string} titulo - Título a limpiar
+ * @returns {string} Título limpio
+ */
+function limpiarParaOrdenar(titulo) {
+  return String(titulo ?? "")
+    .replace(/[¿?¡!«»"'\(\)\[\]\.,_\-]/g, "") // Remueve signos de interrogación, admiración y puntuación
+    .trim()
+    .toLowerCase();
+}
+
+/**
  * Filtra himnos por texto de búsqueda y categoría
  * @param {Array} himnos - Lista de himnos a filtrar
  * @param {string} texto - Texto de búsqueda
@@ -60,18 +71,21 @@ export function obtenerVersionPorVoz(himno, voz) {
  * @returns {Array} Himnos filtrados
  */
 export function filtrarHimnos(himnos, texto, categoria) {
+  const queryNormalizado = normalizarTexto(texto);
+
   return himnos.filter(himno => {
-    const titulo = (himno.titulo ?? "").toLowerCase();
-    const id = String(himno.id ?? "");
-    const categorias = obtenerCategorias(himno).map(c => c.toLowerCase());
+    const rawCategorias = obtenerCategorias(himno);
+    const coincideCategoria = categoria === "" || rawCategorias.includes(categoria);
+
+    const titulo = normalizarTexto(himno.titulo);
+    const id = String(himno.id ?? "").toLowerCase();
+    const categoriasNormalizadas = rawCategorias.map(c => normalizarTexto(c));
 
     const coincideTexto =
-      texto === "" ||
-      titulo.includes(texto) ||
-      id.includes(texto) ||
-      categorias.some(c => c.includes(texto));
-
-    const coincideCategoria = categoria === "" || categorias.includes(categoria);
+      queryNormalizado === "" ||
+      titulo.includes(queryNormalizado) ||
+      id.includes(queryNormalizado) ||
+      categoriasNormalizadas.some(c => c.includes(queryNormalizado));
 
     return coincideTexto && coincideCategoria;
   });
@@ -87,7 +101,13 @@ export function ordenarHimnos(himnos, orden) {
   const copia = [...himnos];
 
   if (orden === "titulo") {
-    copia.sort((a, b) => (a.titulo ?? "").localeCompare(b.titulo ?? ""));
+    copia.sort((a, b) => {
+      const cleanA = limpiarParaOrdenar(a.titulo);
+      const cleanB = limpiarParaOrdenar(b.titulo);
+      const comp = cleanA.localeCompare(cleanB, "es", { sensitivity: "base" });
+      if (comp !== 0) return comp;
+      return cleanA.localeCompare(cleanB, "es");
+    });
   } else if (orden === "reciente") {
     copia.sort((a, b) => {
       const fechaA = new Date(a.fecha_registro || 0).getTime();
@@ -106,7 +126,6 @@ export function ordenarHimnos(himnos, orden) {
 }
 
 export default {
-  obtenerCategoriasUnicas,
   obtenerCategorias,
   obtenerVersionPorVoz,
   filtrarHimnos,
