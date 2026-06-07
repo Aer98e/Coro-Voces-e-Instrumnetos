@@ -10,8 +10,13 @@
 <body>
   <header class="site-header">
     <div class="container header-content">
-      <h1 class="site-title">Coro – Voces y Partituras</h1>
-      <p class="site-subtitle">Audios de ensayo y partituras</p>
+      <div class="header-brand">
+        <h1 class="site-title">Coro – Voces y Partituras</h1>
+        <p class="site-subtitle">Audios de ensayo y partituras</p>
+      </div>
+      <div id="auth-widget" class="auth-widget">
+        <button id="btn-login-open" class="btn btn-login-header">Iniciar sesión</button>
+      </div>
     </div>
   </header>
 
@@ -60,5 +65,42 @@
       <p>Proyecto de ensayos · Himnos y partituras</p>
     </div>
   </footer>
+
+  <!-- Modal de Inicio de Sesión -->
+  <div id="login-modal" class="modal-overlay hidden">
+    <div class="login-card">
+      <button id="btn-login-close" class="modal-close-btn">&times;</button>
+      <h2 class="modal-title-login">Iniciar Sesión</h2>
+      <p class="modal-subtitle-login">Accede a las partituras y audios privados del coro</p>
+      
+      <form id="login-form">
+        <div class="form-group-login">
+          <label for="login-email" class="field-label">Correo electrónico</label>
+          <input
+            id="login-email"
+            type="email"
+            class="search-input"
+            placeholder="correo@ejemplo.com"
+            required
+          >
+        </div>
+        <div class="form-group-login">
+          <label for="login-password" class="field-label">Contraseña</label>
+          <input
+            id="login-password"
+            type="password"
+            class="search-input"
+            placeholder="••••••••"
+            required
+          >
+        </div>
+        <div id="login-error" class="login-error-message hidden"></div>
+        <button type="submit" id="btn-login-submit" class="btn btn-login-submit">
+          <span class="btn-text">Entrar</span>
+          <span class="spinner hidden"></span>
+        </button>
+      </form>
+    </div>
+  </div>
 </body>
 </html>
