@@ -1,0 +1,20 @@
+{
+  "name": "choir-voices-and-sheet-music",
+  "version": "1.0.0",
+  "description": "Aplicación para gestionar audios de ensayo y partituras de coro",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "deploy": "npm run build && git add dist -f && git commit -m 'Deploy' && git subtree push --prefix dist origin gh-pages"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.107.0",
+    "dotenv": "^17.4.2",
+    "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
+  }
+}
