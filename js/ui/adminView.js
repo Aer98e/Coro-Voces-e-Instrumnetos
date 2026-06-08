@@ -42,14 +42,22 @@ export async function initAdminView(subPath, session, role) {
     userTab.style.display = role === 'admin' ? 'block' : 'none';
   }
 
-  // Redirigir si 'special' intenta acceder a usuarios
-  if (role !== 'admin' && (!subPath || subPath === "usuarios")) {
+  // Ocultar pestaña de himnos si no es admin
+  const himnosTab = document.querySelector('a[href="#/admin/himnos"]');
+  if (himnosTab) {
+    himnosTab.style.display = role === 'admin' ? 'block' : 'none';
+  }
+
+  // Redirigir si 'special' intenta acceder a usuarios o himnos
+  if (role !== 'admin' && (!subPath || subPath === "usuarios" || subPath === "himnos")) {
     subPath = "grupos";
     window.location.hash = "#/admin/grupos";
   }
 
   // Por defecto cargar usuarios si no hay ruta o es errónea (y es admin)
-  if (!subPath || subPath === "") subPath = "usuarios";
+  if (!subPath || subPath === "") {
+    subPath = role === 'admin' ? 'usuarios' : 'grupos';
+  }
   
   updateSidebarActiveLink(subPath);
 

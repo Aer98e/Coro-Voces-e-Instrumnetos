@@ -1,0 +1,97 @@
+/* --------- Vista de Perfil --------- */
+.profile-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 2rem;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .profile-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+.profile-panel, .password-panel {
+  background-color: #ffffff;
+  border-radius: 0.75rem;
+  padding: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+@media (max-width: 640px) {
+  .profile-panel, .password-panel {
+    padding: 1.25rem;
+  }
+}
+
+.profile-info-card {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin-top: 1.5rem;
+}
+
+@media (max-width: 480px) {
+  .profile-info-card {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 1rem;
+  }
+}
+
+.profile-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3a6ea5, #6495ED);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(58, 110, 165, 0.3);
+  flex-shrink: 0;
+}
+
+.avatar-initial {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.profile-details {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.profile-value {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1e293b;
+  word-break: break-all;
+}
+
+.badge-large {
+  font-size: 0.85rem;
+  padding: 0.25rem 0.75rem;
+  margin-top: 0.25rem;
+  display: inline-block;
+}
+
+.password-card {
+  margin-top: 1rem;
+}
+
+.login-success-message {
+  background-color: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #047857;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+  line-height: 1.4;
+}
