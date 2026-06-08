@@ -134,9 +134,9 @@ function actualizarHeaderUI(user, role) {
         e.stopPropagation();
         userDropdown.classList.toggle("hidden");
       });
-      // Cerrar al hacer clic fuera
+      // Cerrar al hacer clic fuera o al seleccionar una opción (dropdown-item)
       document.addEventListener("click", (e) => {
-        if (!userDropdown.contains(e.target) && e.target !== userMenuBtn) {
+        if (e.target.closest(".dropdown-item") || (!userDropdown.contains(e.target) && e.target !== userMenuBtn)) {
           userDropdown.classList.add("hidden");
         }
       });
