@@ -1,0 +1,24 @@
+<div class="fade-in">
+  <div class="admin-header-flex">
+    <h2 class="section-title">Gestión de Usuarios</h2>
+    <input type="text" id="admin-user-search" class="search-input" placeholder="Buscar por correo..." style="width: auto; margin: 0;">
+  </div>
+  
+  <p class="modal-subtitle-login" style="text-align: left; margin-bottom: 1.5rem;">Administra los niveles de acceso de todos los usuarios registrados en la plataforma.</p>
+
+  <div class="table-container">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Correo Electrónico</th>
+          <th>ID Usuario</th>
+          <th>Rol</th>
+          <th style="text-align: right;">Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="admin-users-tbody">
+        <tr><td colspan="4" class="loading-message" style="text-align: center;">Cargando usuarios...</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
