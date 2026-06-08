@@ -77,15 +77,23 @@ La aplicación está configurada para desplegarse automáticamente en GitHub Pag
 2. Activa GitHub Pages en Settings → Pages → GitHub Actions
 3. Push a GitHub - ¡el deployment se hace automáticamente!
 
+## 🔐 Sistema de Autenticación (Supabase Auth)
+
+La aplicación cuenta con un inicio de sesión integrado en el encabezado principal:
+* **Ingreso**: Los usuarios pueden iniciar sesión con su correo electrónico y contraseña desde un modal moderno.
+* **Control de Acceso (RLS)**: Al autenticarse, Supabase expone automáticamente los himnos privados (`access_level = 'private'`).
+* **Roles e Interfaz**: El sistema consulta el rol del usuario en la tabla `profiles`. Si el usuario tiene el rol de `admin` o `special`, se le muestra en el encabezado un botón de **Administrar** para ingresar al panel de administración.
+* **Cierre de Sesión**: Un botón de **Cerrar sesión** limpia el estado y restablece la vista pública (filtrando de nuevo los himnos privados).
+
+---
+
 ## 🗄️ Estructura de Supabase
 
-### Tablas principales
+La base de datos, políticas de Row Level Security (RLS), triggers y funciones personalizadas de PostgreSQL están detalladas en la documentación dedicada:
 
-- **hymns**: Información de himnos (id, title, hymn_key, register, access_level)
-- **voices**: Voces disponibles (id, voice_name)
-- **categories**: Categorías de himnos (id, category_name)
-- **hymn_voice**: Relación muchos-a-muchos entre himnos y voces (hymn_id, voice_id, audio_url, pdf_url)
-- **hymn_category**: Relación muchos-a-muchos entre himnos y categorías (hymn_id, category_id)
+👉 Ver [DATABASE.md](DATABASE.md)
+
+---
 
 ## 🐛 Solución de problemas
 
@@ -105,8 +113,9 @@ Este es un error menor que no afecta la funcionalidad. Si deseas eliminarlo, cre
 ### 1. Integración de la Interfaz de Administración (`interfaz_admin`)
 Actualmente, la interfaz de administración (ubicada en [interfaz_admin](file:///d:/DAaron/Programming%20Proyects/Mi%20Pages/ChoirVoicesAndSheetMusic/interfaz_admin/)) funciona como una **maqueta interactiva local**:
 * Carga datos de prueba desde [data/data.json](file:///d:/DAaron/Programming%20Proyects/Mi%20Pages/ChoirVoicesAndSheetMusic/data/data.json).
-* Las acciones de añadir, editar o eliminar registros solo ocurren en la memoria del navegador y no se guardan en la base de datos de Supabase ni en el archivo JSON.
-* **Pendiente**: Conectar esta interfaz con el cliente de Supabase (`supabase.js`) usando llamadas `insert`, `update` y `delete` para persistir los datos de forma real.
+* Las acciones de añadir, editar o eliminar registros solo ocurren en la memoria del navegador.
+* **Acceso**: Ahora está integrada en el header principal de la app y solo se muestra a usuarios con rol `admin` o `special` tras iniciar sesión.
+* **Pendiente**: Conectar las acciones de esta interfaz con el cliente de Supabase (`supabase.js`) usando llamadas `insert`, `update` y `delete` para que los administradores guarden los datos de forma real.
 
 ### 2. Estructura y Subida de Archivos en Supabase Storage
 Para que la aplicación funcione en producción, los archivos de audio y las partituras deben subirse al bucket `"hymns"` de Supabase Storage:
@@ -114,8 +123,4 @@ Para que la aplicación funcione en producción, los archivos de audio y las par
   * `audios/<id_himno>/` para las pistas de audio (ej: `audios/1/soprano.mp3`).
   * `scores/<id_himno>/` para las partituras en PDF (ej: `scores/1/soprano.pdf`).
 * Las rutas relativas de estos archivos deben registrarse en la tabla mediadora `hymn_voice` bajo las columnas `audio_url` y `pdf_url` respectivamente.
-
-### 3. Configuración de RLS (Row Level Security)
-En Supabase, debes configurar las siguientes políticas para proteger tu base de datos y tus archivos:
-* **Lectura**: Permitir acceso de lectura pública (`anon`) a las tablas del sistema y al bucket `"hymns"` para que los usuarios puedan reproducir audios y ver partituras.
-* **Escritura**: Restringir la inserción, modificación y eliminación (tanto en tablas como en storage) únicamente a usuarios autenticados con rol de administrador (empleando RLS con autenticación de Supabase Auth).
+* Las URLs de descarga y reproducción se firmarán bajo demanda de manera segura por el frontend.

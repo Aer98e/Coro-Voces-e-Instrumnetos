@@ -4,55 +4,51 @@
   <meta charset="UTF-8">
   <title>Coro – Voces y Partituras</title>
   <link rel="stylesheet" href="styles.css">
+  <link rel="icon" type="image/png" sizes="16x16" href="images/ico-aer98e-16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="images/ico-aer98e-32.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="images/ico-aer98e-48.png">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>
+    // Capturar errores globales y mostrarlos en pantalla en lugar de colgarse
+    window.addEventListener('error', function(e) {
+      const outlet = document.getElementById("router-outlet");
+      if (outlet) {
+        outlet.innerHTML = `<div style="text-align: center; margin-top: 2rem; color: #dc2626; padding: 1.5rem; border: 1px solid #fecaca; background: #fef2f2; border-radius: 0.5rem; max-width: 600px; margin: 2rem auto; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
+          <h3 style="margin-top:0; font-size:1.1rem; font-weight:600;">Error de Carga</h3>
+          <p style="font-family: monospace; font-size: 0.85rem; text-align: left; white-space: pre-wrap; margin: 1rem 0 0; background: #fff; padding: 0.75rem; border-radius: 0.25rem; border: 1px solid #fee2e2; overflow-x: auto;">${e.message}\n\nEn: ${e.filename}:${e.lineno}:${e.colno}</p>
+        </div>`;
+      }
+    });
+    window.addEventListener('unhandledrejection', function(e) {
+      const outlet = document.getElementById("router-outlet");
+      if (outlet) {
+        const reason = e.reason;
+        const msg = reason ? (reason.stack || reason.message || reason) : 'Error de promesa desconocido';
+        outlet.innerHTML = `<div style="text-align: center; margin-top: 2rem; color: #dc2626; padding: 1.5rem; border: 1px solid #fecaca; background: #fef2f2; border-radius: 0.5rem; max-width: 600px; margin: 2rem auto; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
+          <h3 style="margin-top:0; font-size:1.1rem; font-weight:600;">Error de Carga (Promesa)</h3>
+          <p style="font-family: monospace; font-size: 0.85rem; text-align: left; white-space: pre-wrap; margin: 1rem 0 0; background: #fff; padding: 0.75rem; border-radius: 0.25rem; border: 1px solid #fee2e2; overflow-x: auto;">${msg}</p>
+        </div>`;
+      }
+    });
+  </script>
   <script type="module" src="js/main.js" defer></script>
 </head>
 <body>
   <header class="site-header">
     <div class="container header-content">
-      <h1 class="site-title">Coro – Voces y Partituras</h1>
-      <p class="site-subtitle">Audios de ensayo y partituras</p>
+      <div class="header-brand">
+        <h1 class="site-title">Coro – Voces y Partituras</h1>
+        <p class="site-subtitle">Audios de ensayo y partituras</p>
+      </div>
+      <div id="auth-widget" class="auth-widget">
+        <button id="btn-login-open" class="btn btn-login-header">Iniciar sesión</button>
+      </div>
     </div>
   </header>
 
-  <main class="container main-layout">
-    <section class="search-panel">
-      <h2 class="section-title">Buscar</h2>
-
-      <label class="field-label" for="search-input">Título o número de himno</label>
-      <input
-        id="search-input"
-        type="text"
-        class="search-input"
-        placeholder="Ejemplo: Santo, Santo, Santo"
-      >
-
-      <div class="filters">
-        <div class="filter-group">
-          <label class="field-label" for="category-select">Categoría</label>
-          <select id="category-select" class="select-input">
-            <option value="">Todas</option>
-            <option value="himno">Himno</option>
-            <option value="especial">Especial</option>
-            <option value="navidad">Navidad</option>
-          </select>
-        </div>
-
-        <div class="filter-group">
-          <label class="field-label" for="order-select">Ordenar por</label>
-          <select id="order-select" class="select-input">
-            <option value="titulo">Título</option>
-            <option value="reciente">Recientes</option>
-            <option value="antiguo">Agregados hace mucho</option>
-          </select>
-        </div>
-      </div>
-    </section>
-
-    <section class="results-panel">
-      <h2 class="section-title">Resultados</h2>
-      <p class="loading-message">Cargando himnos...</p>
-    </section>
+  <main class="container router-container" id="router-outlet">
+    <!-- El contenido de las vistas se inyectará aquí dinámicamente -->
+    <p class="loading-message" style="text-align: center; margin-top: 2rem;">Cargando...</p>
   </main>
 
   <footer class="site-footer">
@@ -60,5 +56,42 @@
       <p>Proyecto de ensayos · Himnos y partituras</p>
     </div>
   </footer>
+
+  <!-- Modal de Inicio de Sesión -->
+  <div id="login-modal" class="modal-overlay hidden">
+    <div class="login-card">
+      <button id="btn-login-close" class="modal-close-btn">&times;</button>
+      <h2 class="modal-title-login">Iniciar Sesión</h2>
+      <p class="modal-subtitle-login">Accede a las partituras y audios privados del coro</p>
+      
+      <form id="login-form">
+        <div class="form-group-login">
+          <label for="login-email" class="field-label">Correo electrónico</label>
+          <input
+            id="login-email"
+            type="email"
+            class="search-input"
+            placeholder="correo@ejemplo.com"
+            required
+          >
+        </div>
+        <div class="form-group-login">
+          <label for="login-password" class="field-label">Contraseña</label>
+          <input
+            id="login-password"
+            type="password"
+            class="search-input"
+            placeholder="••••••••"
+            required
+          >
+        </div>
+        <div id="login-error" class="login-error-message hidden"></div>
+        <button type="submit" id="btn-login-submit" class="btn btn-login-submit">
+          <span class="btn-text">Entrar</span>
+          <span class="spinner hidden"></span>
+        </button>
+      </form>
+    </div>
+  </div>
 </body>
 </html>

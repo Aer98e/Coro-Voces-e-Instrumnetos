@@ -1,0 +1,33 @@
+<div class="fade-in">
+  <div class="admin-header-flex">
+    <h2 class="section-title">Grupos Corales</h2>
+  </div>
+  <p class="modal-subtitle-login" style="text-align: left; margin-bottom: 1.5rem;">Crea grupos personalizados y añade a los integrantes de tu coro.</p>
+
+  <div class="admin-grid-layout">
+    
+    <!-- Panel para Crear Grupo -->
+    <div class="admin-card">
+      <h3 class="card-title">Crear Nuevo Grupo</h3>
+      <form id="create-group-form" class="form-compact">
+        <div class="form-group-login">
+          <label for="group-name" class="field-label">Nombre del Grupo</label>
+          <input type="text" id="group-name" class="search-input" placeholder="Ej. Coro de Jóvenes" required style="margin-bottom: 0.5rem;">
+        </div>
+        <button type="submit" class="btn btn-secondary w-full">Crear Grupo</button>
+      </form>
+    </div>
+
+    <!-- Lista de Grupos Existentes -->
+    <div class="admin-card" style="grid-column: span 2;">
+      <h3 class="card-title">Mis Grupos</h3>
+      <div id="groups-list" class="groups-container">
+        <p class="loading-message">Cargando grupos...</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Datalist global para sugerencias de correos -->
+<datalist id="registered-emails-list"></datalist>
