@@ -1,0 +1,106 @@
+<div id="tab-categorias" class="admin-tab-content">
+  <div class="admin-header-flex">
+    <h2 class="section-title" style="margin:0;">Gestión de Categorías</h2>
+  </div>
+  <p style="color: #64748b; margin-bottom: 1.5rem;">Crea categorías personalizadas y vincula los himnos disponibles a ellas.</p>
+
+  <div class="admin-card" style="margin-bottom: 2rem;">
+    <h3 class="card-title">Crear Nueva Categoría</h3>
+    <form id="create-category-form" class="form-compact" style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
+      <div style="flex: 2; min-width: 200px;">
+        <label class="field-label" for="category-name">Nombre de la Categoría</label>
+        <input type="text" id="category-name" class="search-input" placeholder="Ej. Culto Dominical" required>
+      </div>
+      <div id="category-group-selector-wrapper" style="flex: 2; min-width: 200px;">
+        <label class="field-label" id="category-group-label" for="category-group-select">Vincular al Grupo</label>
+        <select id="category-group-select" class="select-input">
+          <!-- Opciones cargadas por JS -->
+        </select>
+      </div>
+      <button type="submit" class="btn btn-primary" style="flex: 1; min-width: 150px; height: 40px; display: flex; align-items: center; justify-content: center;">Crear Categoría</button>
+    </form>
+  </div>
+
+  <div class="table-container">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Nombre de Categoría</th>
+          <th>Tipo</th>
+          <th>Asignada a</th>
+          <th>Himnos Vinculados</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="categories-table-body">
+        <tr><td colspan="5" style="text-align:center;">Cargando categorías...</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal para vincular himnos a una categoría (Vinculación en Bloque / Selección Múltiple) -->
+<div id="link-hymns-modal" class="modal-overlay hidden">
+  <div class="login-card" style="max-width: 600px; width: 95%; padding: 2rem;">
+    <button id="btn-link-hymns-close" class="modal-close-btn">&times;</button>
+    <h2 class="modal-title-login" style="margin-bottom: 0.25rem;">Vincular Himnos</h2>
+    <p class="modal-subtitle-login" id="link-hymns-subtitle" style="margin-bottom: 1.5rem;">Categoría: Seleccionada</p>
+    
+    <div style="margin-bottom: 1rem;">
+      <input type="text" id="search-hymn-input" class="search-input" placeholder="Filtrar por título de himno..." autocomplete="off" style="margin: 0; width: 100%;">
+    </div>
+
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+      <span style="font-size: 0.8rem; color: #64748b;" id="hymns-count-info">Cargando himnos...</span>
+      <div style="display: flex; gap: 0.5rem;">
+        <button type="button" id="btn-select-all-hymns" class="btn btn-ghost btn-sm" style="padding: 0.2rem 0.5rem; border: 1px solid #cbd5e1;">Marcar Todos</button>
+        <button type="button" id="btn-deselect-all-hymns" class="btn btn-ghost btn-sm" style="padding: 0.2rem 0.5rem; border: 1px solid #cbd5e1;">Desmarcar Todos</button>
+      </div>
+    </div>
+
+    <div id="hymns-checklist-container" class="hymn-checkbox-list" style="margin-bottom: 1.5rem; max-height: 250px; overflow-y: auto;">
+      <!-- Listado de checkboxes inyectado por JS -->
+    </div>
+
+    <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+      <button type="button" id="btn-link-hymns-cancel" class="btn btn-ghost">Cancelar</button>
+      <button type="button" id="btn-link-hymns-save" class="btn btn-primary" style="min-width: 140px; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+        <span class="btn-text">Guardar Cambios</span>
+        <span class="spinner hidden"></span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para editar una categoría (Renombrar y reasignar grupo/global) -->
+<div id="edit-category-modal" class="modal-overlay hidden">
+  <div class="login-card" style="max-width: 500px; width: 90%; padding: 2rem;">
+    <button id="btn-edit-category-close" class="modal-close-btn">&times;</button>
+    <h2 class="modal-title-login" style="margin-bottom: 0.25rem;">Editar Categoría</h2>
+    <p class="modal-subtitle-login" style="margin-bottom: 1.5rem;">Modifica los detalles de la categoría</p>
+    
+    <form id="edit-category-form" class="form-compact">
+      <input type="hidden" id="edit-category-id">
+      
+      <div style="margin-bottom: 1rem;">
+        <label class="field-label" for="edit-category-name">Nombre de la Categoría</label>
+        <input type="text" id="edit-category-name" class="search-input" required placeholder="Ej. Culto de Jóvenes">
+      </div>
+      
+      <div id="edit-category-group-wrapper" style="margin-bottom: 1.5rem;">
+        <label class="field-label" id="edit-category-group-label" for="edit-category-group-select">Vincular al Grupo</label>
+        <select id="edit-category-group-select" class="select-input">
+          <!-- Opciones cargadas por JS -->
+        </select>
+      </div>
+      
+      <div style="display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 1.5rem;">
+        <button type="button" id="btn-edit-category-cancel" class="btn btn-ghost">Cancelar</button>
+        <button type="submit" id="btn-edit-category-submit" class="btn btn-primary" style="min-width: 140px; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+          <span class="btn-text">Guardar Cambios</span>
+          <span class="spinner hidden"></span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

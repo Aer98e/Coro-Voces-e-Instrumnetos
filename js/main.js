@@ -1,44 +1,25 @@
 /**
  * Punto de entrada de la aplicación
- * Inicializa la aplicación y coordina los módulos
+ * Inicializa la aplicación, la autenticación y el enrutador SPA
  */
 
-import {
-  inputBusqueda,
-  selectCategoria,
-  selectOrden,
-  authWidget,
-  btnLoginOpen,
-  loginModal,
-  btnLoginClose,
-  loginForm,
-  loginEmail,
-  loginPassword,
-  loginError,
-  btnLoginSubmit
-} from "./config/selectors.js";
-import { cargarHimnos, cargarCategoriasUnicas } from "./services/hymnService.js";
-import { filtrarHimnos, ordenarHimnos } from "./domain/hymn.js";
-import { renderizarCategorias, renderizarResultados } from "./ui/renderer.js";
-import { mostrarError } from "./ui/errorHandler.js";
 import supabase from "./config/supabase.js";
+import { initRouter, handleRouteChange } from "./router.js";
 
 // Estado global
-let himnos = [];
+let currentSession = null;
+let currentRole = 'member';
 
-/**
- * Actualiza los resultados según los filtros y orden actuales
- */
-function actualizar() {
-  const texto = inputBusqueda.value.trim().toLowerCase();
-  const categoria = selectCategoria.value;
-  const orden = selectOrden.value;
-
-  let filtrados = filtrarHimnos(himnos, texto, categoria);
-  filtrados = ordenarHimnos(filtrados, orden);
-
-  renderizarResultados(filtrados);
-}
+// Selectores globales (fuera de las vistas dinámicas)
+const authWidget = document.getElementById("auth-widget");
+const btnLoginOpen = document.getElementById("btn-login-open");
+const loginModal = document.getElementById("login-modal");
+const btnLoginClose = document.getElementById("btn-login-close");
+const loginForm = document.getElementById("login-form");
+const loginEmail = document.getElementById("login-email");
+const loginPassword = document.getElementById("login-password");
+const loginError = document.getElementById("login-error");
+const btnLoginSubmit = document.getElementById("btn-login-submit");
 
 /**
  * Abre el modal de inicio de sesión
@@ -70,7 +51,6 @@ async function manejarLogin(e) {
   const btnText = btnLoginSubmit.querySelector(".btn-text");
   const spinner = btnLoginSubmit.querySelector(".spinner");
 
-  // Mostrar cargando
   btnLoginSubmit.disabled = true;
   if (btnText) btnText.textContent = "Ingresando...";
   if (spinner) spinner.classList.remove("hidden");
@@ -109,29 +89,6 @@ async function cerrarSesion() {
 }
 
 /**
- * Recarga los himnos y categorías desde Supabase aplicando permisos actuales
- */
-async function recargarDatos() {
-  try {
-    const panelResultados = document.querySelector(".results-panel");
-    if (panelResultados) {
-      panelResultados.innerHTML = `
-        <h2 class="section-title">Resultados</h2>
-        <p class="loading-message">Cargando himnos...</p>
-      `;
-    }
-
-    himnos = await cargarHimnos();
-    const categorias = await cargarCategoriasUnicas();
-
-    renderizarCategorias(categorias);
-    actualizar();
-  } catch (error) {
-    mostrarError(`No se pudieron cargar los datos. ${error.message}`);
-  }
-}
-
-/**
  * Actualiza los elementos del header según el estado de autenticación y rol
  */
 function actualizarHeaderUI(user, role) {
@@ -146,28 +103,59 @@ function actualizarHeaderUI(user, role) {
 
     let adminLink = '';
     if (role === 'admin' || role === 'special') {
-      adminLink = `<a href="interfaz_admin/managerInterface.html" class="btn btn-admin-header">Administrar</a>`;
+      adminLink = `<a href="#/admin" class="dropdown-item">Administrar</a>`;
     }
 
     authWidget.innerHTML = `
-      <div class="user-info-container">
-        <span class="user-email">${user.email}</span>
-        <span class="badge badge-role">${roleText}</span>
-        ${adminLink}
-        <button id="btn-logout" class="btn btn-logout-header">Cerrar sesión</button>
+      <div class="user-menu-container">
+        <button id="btn-user-menu" class="btn-user-icon" title="Opciones de usuario">
+          <span class="avatar-sm">${user.email.charAt(0).toUpperCase()}</span>
+        </button>
+        <div id="user-dropdown" class="user-dropdown hidden">
+          <div class="dropdown-header">
+            <span class="user-email-dropdown">${user.email}</span>
+            <span class="badge badge-role" style="color: initial;">${roleText}</span>
+          </div>
+          <hr class="dropdown-divider">
+          ${adminLink}
+          <a href="#/perfil" class="dropdown-item">Mi Perfil</a>
+          <button id="btn-logout" class="dropdown-item text-danger">Cerrar sesión</button>
+        </div>
       </div>
     `;
 
     const logoutBtn = document.getElementById("btn-logout");
     if (logoutBtn) logoutBtn.addEventListener("click", cerrarSesion);
+
+    const userMenuBtn = document.getElementById("btn-user-menu");
+    const userDropdown = document.getElementById("user-dropdown");
+    if (userMenuBtn && userDropdown) {
+      userMenuBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        userDropdown.classList.toggle("hidden");
+      });
+      // Cerrar al hacer clic fuera
+      document.addEventListener("click", (e) => {
+        if (!userDropdown.contains(e.target) && e.target !== userMenuBtn) {
+          userDropdown.classList.add("hidden");
+        }
+      });
+    }
   }
+}
+
+/**
+ * Devuelve la sesión y el rol actuales (usado por el router)
+ */
+export async function getSessionAndRole() {
+  return { session: currentSession, role: currentRole };
 }
 
 /**
  * Inicializa la aplicación
  */
 async function inicializar() {
-  // Configurar listeners de la modal
+  // Configurar listeners de la modal de login
   if (btnLoginOpen) btnLoginOpen.addEventListener("click", abrirModal);
   if (btnLoginClose) btnLoginClose.addEventListener("click", cerrarModal);
   
@@ -179,16 +167,47 @@ async function inicializar() {
 
   if (loginForm) loginForm.addEventListener("submit", manejarLogin);
 
-  // Configurar event listeners de filtros
-  inputBusqueda.addEventListener("input", actualizar);
-  selectCategoria.addEventListener("change", actualizar);
-  selectOrden.addEventListener("change", actualizar);
+  // Inicializar enrutador
+  initRouter(getSessionAndRole);
 
-  // Escuchar estado de autenticación de Supabase (esto se ejecuta al inicio automáticamente)
+  // Obtener sesión inicial de manera proactiva para evitar esperas y bloqueos infinitos
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    currentSession = session;
+    currentRole = 'member';
+
+    if (session?.user) {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', session.user.id)
+        .single();
+
+      if (!error && data) {
+        currentRole = data.role;
+      }
+    }
+    actualizarHeaderUI(currentSession?.user || null, currentRole);
+    await handleRouteChange(currentSession, currentRole);
+  } catch (error) {
+    console.error("⚠️ Error obteniendo sesión inicial:", error);
+    // Cargar la ruta de todas formas para evitar quedarse pegado en Cargando
+    actualizarHeaderUI(null, 'member');
+    await handleRouteChange(null, 'member');
+  }
+
+  // Escuchar futuros cambios de estado de autenticación de Supabase (inicio/cierre de sesión)
   supabase.auth.onAuthStateChange(async (event, session) => {
-    console.log(`🔐 Evento Auth: ${event}`);
+    console.log(`🔐 Evento Auth posterior: ${event}`);
+    
+    // Evitar recargar la ruta en el evento inicial si ya la procesamos arriba
+    if (event === 'INITIAL_SESSION' && currentSession) {
+      return;
+    }
+
     const user = session?.user || null;
-    let role = 'member';
+    currentSession = session;
+    currentRole = 'member';
 
     if (user) {
       try {
@@ -199,17 +218,18 @@ async function inicializar() {
           .single();
 
         if (!error && data) {
-          role = data.role;
+          currentRole = data.role;
         }
       } catch (e) {
-        console.warn("⚠️ No se pudo obtener el rol del usuario, por defecto 'member':", e);
+        console.warn("⚠️ No se pudo obtener el rol del usuario en cambio de auth, por defecto 'member':", e);
       }
-      actualizarHeaderUI(user, role);
+      actualizarHeaderUI(user, currentRole);
     } else {
       actualizarHeaderUI(null, null);
     }
 
-    await recargarDatos();
+    // Forzar re-evaluación de la ruta actual basada en la nueva sesión
+    handleRouteChange(currentSession, currentRole);
   });
 }
 

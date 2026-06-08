@@ -1,0 +1,283 @@
+<div id="tab-himnos" class="admin-tab-content">
+  <div class="admin-header-flex">
+    <h2 class="section-title" style="margin:0;">Biblioteca de Himnos</h2>
+  </div>
+  <p style="color: #64748b; margin-bottom: 1.5rem;">Registra nuevos himnos en el repertorio, sube archivos de ensayo por voces (MP3) y partituras (PDF).</p>
+
+  <!-- Formulario de creación de himno -->
+  <div class="admin-card" style="margin-bottom: 2rem;">
+    <h3 class="card-title">Agregar Nuevo Himno</h3>
+    <form id="create-hymn-form" class="form-compact" enctype="multipart/form-data">
+      
+      <!-- Metadatos básicos -->
+      <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem;">
+        <div style="flex: 2; min-width: 200px;">
+          <label class="field-label" for="hymn-title">Título del Himno</label>
+          <input type="text" id="hymn-title" class="search-input" placeholder="Ej. Grande es tu fidelidad" required>
+        </div>
+        <div style="flex: 1; min-width: 120px;">
+          <label class="field-label" for="hymn-key">Tono (Clave)</label>
+          <input type="text" id="hymn-key" class="search-input" placeholder="Ej. Sol mayor">
+        </div>
+        <div style="flex: 1; min-width: 150px;">
+          <label class="field-label" for="hymn-version">Versión / Himnario</label>
+          <input type="text" id="hymn-version" class="search-input" placeholder="Ej. Libre o Himnos de Gracia">
+        </div>
+        <div style="flex: 1; min-width: 130px;">
+          <label class="field-label" for="hymn-access">Nivel de Acceso</label>
+          <select id="hymn-access" class="select-input" required>
+            <option value="public" selected>Público (Miembros e Invitados)</option>
+            <option value="private">Privado (Solo Miembros)</option>
+            <option value="hidden">Oculto (Solo Administradores)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Subida de archivos por voces -->
+      <div style="margin-bottom: 1.5rem;">
+        <h4 style="margin: 0 0 0.75rem; font-size: 0.95rem; color: #475569; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.25rem;">Archivos por Voces e Instrumentos</h4>
+        
+        <div class="voice-files-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
+          
+          <!-- Soprano (ID: 1) -->
+          <div style="background: #f8fafc; padding: 0.75rem; border-radius: 0.5rem; border: 1px solid #e2e8f0;">
+            <span style="font-weight: 600; font-size: 0.85rem; color: #1e293b; display: block; margin-bottom: 0.25rem;">Soprano</span>
+            <div class="file-upload-row">
+              <div class="file-upload-col">
+                <label class="file-upload-btn" for="audio-voice-1" title="Subir audio de Soprano">
+                  <span>🎵 +</span>
+                </label>
+                <input type="file" id="audio-voice-1" class="voice-audio-input hidden" data-voice="1" accept="audio/mpeg,audio/mp3">
+                <span class="file-name-text" id="name-audio-voice-1">Sin archivo</span>
+              </div>
+              <div class="file-upload-col">
+                <label class="file-upload-btn" for="pdf-voice-1" title="Subir partitura de Soprano">
+                  <span>📄 +</span>
+                </label>
+                <input type="file" id="pdf-voice-1" class="voice-pdf-input hidden" data-voice="1" accept="application/pdf">
+                <span class="file-name-text" id="name-pdf-voice-1">Sin archivo</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Alto / Contralto (ID: 2) -->
+          <div style="background: #f8fafc; padding: 0.75rem; border-radius: 0.5rem; border: 1px solid #e2e8f0;">
+            <span style="font-weight: 600; font-size: 0.85rem; color: #1e293b; display: block; margin-bottom: 0.25rem;">Contralto (Alto)</span>
+            <div class="file-upload-row">
+              <div class="file-upload-col">
+                <label class="file-upload-btn" for="audio-voice-2" title="Subir audio de Contralto">
+                  <span>🎵 +</span>
+                </label>
+                <input type="file" id="audio-voice-2" class="voice-audio-input hidden" data-voice="2" accept="audio/mpeg,audio/mp3">
+                <span class="file-name-text" id="name-audio-voice-2">Sin archivo</span>
+              </div>
+              <div class="file-upload-col">
+                <label class="file-upload-btn" for="pdf-voice-2" title="Subir partitura de Contralto">
+                  <span>📄 +</span>
+                </label>
+                <input type="file" id="pdf-voice-2" class="voice-pdf-input hidden" data-voice="2" accept="application/pdf">
+                <span class="file-name-text" id="name-pdf-voice-2">Sin archivo</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tenor (ID: 3) -->
+          <div style="background: #f8fafc; padding: 0.75rem; border-radius: 0.5rem; border: 1px solid #e2e8f0;">
+            <span style="font-weight: 600; font-size: 0.85rem; color: #1e293b; display: block; margin-bottom: 0.25rem;">Tenor</span>
+            <div class="file-upload-row">
+              <div class="file-upload-col">
+                <label class="file-upload-btn" for="audio-voice-3" title="Subir audio de Tenor">
+                  <span>🎵 +</span>
+                </label>
+                <input type="file" id="audio-voice-3" class="voice-audio-input hidden" data-voice="3" accept="audio/mpeg,audio/mp3">
+                <span class="file-name-text" id="name-audio-voice-3">Sin archivo</span>
+              </div>
+              <div class="file-upload-col">
+                <label class="file-upload-btn" for="pdf-voice-3" title="Subir partitura de Tenor">
+                  <span>📄 +</span>
+                </label>
+                <input type="file" id="pdf-voice-3" class="voice-pdf-input hidden" data-voice="3" accept="application/pdf">
+                <span class="file-name-text" id="name-pdf-voice-3">Sin archivo</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bajo (ID: 4) -->
+          <div style="background: #f8fafc; padding: 0.75rem; border-radius: 0.5rem; border: 1px solid #e2e8f0;">
+            <span style="font-weight: 600; font-size: 0.85rem; color: #1e293b; display: block; margin-bottom: 0.25rem;">Bajo</span>
+            <div class="file-upload-row">
+              <div class="file-upload-col">
+                <label class="file-upload-btn" for="audio-voice-4" title="Subir audio de Bajo">
+                  <span>🎵 +</span>
+                </label>
+                <input type="file" id="audio-voice-4" class="voice-audio-input hidden" data-voice="4" accept="audio/mpeg,audio/mp3">
+                <span class="file-name-text" id="name-audio-voice-4">Sin archivo</span>
+              </div>
+              <div class="file-upload-col">
+                <label class="file-upload-btn" for="pdf-voice-4" title="Subir partitura de Bajo">
+                  <span>📄 +</span>
+                </label>
+                <input type="file" id="pdf-voice-4" class="voice-pdf-input hidden" data-voice="4" accept="application/pdf">
+                <span class="file-name-text" id="name-pdf-voice-4">Sin archivo</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Piano (ID: 5) -->
+          <div style="background: #f8fafc; padding: 0.75rem; border-radius: 0.5rem; border: 1px solid #e2e8f0;">
+            <span style="font-weight: 600; font-size: 0.85rem; color: #1e293b; display: block; margin-bottom: 0.25rem;">Piano</span>
+            <div class="file-upload-row">
+              <div class="file-upload-col">
+                <label class="file-upload-btn" for="audio-voice-5" title="Subir audio de Piano">
+                  <span>🎵 +</span>
+                </label>
+                <input type="file" id="audio-voice-5" class="voice-audio-input hidden" data-voice="5" accept="audio/mpeg,audio/mp3">
+                <span class="file-name-text" id="name-audio-voice-5">Sin archivo</span>
+              </div>
+              <div class="file-upload-col">
+                <label class="file-upload-btn" for="pdf-voice-5" title="Subir partitura de Piano">
+                  <span>📄 +</span>
+                </label>
+                <input type="file" id="pdf-voice-5" class="voice-pdf-input hidden" data-voice="5" accept="application/pdf">
+                <span class="file-name-text" id="name-pdf-voice-5">Sin archivo</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Solo (ID: 6) -->
+          <div style="background: #f8fafc; padding: 0.75rem; border-radius: 0.5rem; border: 1px solid #e2e8f0;">
+            <span style="font-weight: 600; font-size: 0.85rem; color: #1e293b; display: block; margin-bottom: 0.25rem;">Solo</span>
+            <div class="file-upload-row">
+              <div class="file-upload-col">
+                <label class="file-upload-btn" for="audio-voice-6" title="Subir audio de Solo">
+                  <span>🎵 +</span>
+                </label>
+                <input type="file" id="audio-voice-6" class="voice-audio-input hidden" data-voice="6" accept="audio/mpeg,audio/mp3">
+                <span class="file-name-text" id="name-audio-voice-6">Sin archivo</span>
+              </div>
+              <div class="file-upload-col">
+                <label class="file-upload-btn" for="pdf-voice-6" title="Subir partitura de Solo">
+                  <span>📄 +</span>
+                </label>
+                <input type="file" id="pdf-voice-6" class="voice-pdf-input hidden" data-voice="6" accept="application/pdf">
+                <span class="file-name-text" id="name-pdf-voice-6">Sin archivo</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Todos / General (ID: 7) -->
+          <div style="background: #f8fafc; padding: 0.75rem; border-radius: 0.5rem; border: 1px solid #e2e8f0;">
+            <span style="font-weight: 600; font-size: 0.85rem; color: #1e293b; display: block; margin-bottom: 0.25rem;">Todos (General)</span>
+            <div class="file-upload-row">
+              <div class="file-upload-col">
+                <label class="file-upload-btn" for="audio-voice-7" title="Subir audio General">
+                  <span>🎵 +</span>
+                </label>
+                <input type="file" id="audio-voice-7" class="voice-audio-input hidden" data-voice="7" accept="audio/mpeg,audio/mp3">
+                <span class="file-name-text" id="name-audio-voice-7">Sin archivo</span>
+              </div>
+              <div class="file-upload-col">
+                <label class="file-upload-btn" for="pdf-voice-7" title="Subir partitura General">
+                  <span>📄 +</span>
+                </label>
+                <input type="file" id="pdf-voice-7" class="voice-pdf-input hidden" data-voice="7" accept="application/pdf">
+                <span class="file-name-text" id="name-pdf-voice-7">Sin archivo</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Subida con Spinner/Progreso -->
+      <div style="display: flex; justify-content: flex-end; align-items: center; gap: 1rem;">
+        <span id="create-hymn-status" style="font-size: 0.85rem; color: #475569;"></span>
+        <button type="submit" id="btn-create-hymn-submit" class="btn btn-primary" style="min-width: 140px; display: flex; align-items: center; justify-content: center; gap: 0.5rem; height: 40px;">
+          <span class="btn-text">Guardar Himno</span>
+          <span class="spinner hidden"></span>
+        </button>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- Tabla de listado de himnos -->
+  <div class="table-container">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Título</th>
+          <th>Tono</th>
+          <th>Versión</th>
+          <th>Acceso</th>
+          <th>Archivos por Voz (Audio/PDF)</th>
+          <th style="text-align: right;">Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="hymns-table-body">
+        <tr><td colspan="7" style="text-align:center;">Cargando biblioteca de himnos...</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal para editar metadatos y reemplazar archivos de un himno -->
+<div id="edit-hymn-modal" class="modal-overlay hidden">
+  <div class="login-card" style="max-width: 750px; width: 95%; padding: 2rem;">
+    <button id="btn-edit-hymn-close" class="modal-close-btn">&times;</button>
+    <h2 class="modal-title-login" style="margin-bottom: 0.25rem;">Editar Himno</h2>
+    <p class="modal-subtitle-login" style="margin-bottom: 1.5rem;">Modifica los metadatos o reemplaza los archivos del himno</p>
+    
+    <form id="edit-hymn-form" class="form-compact" enctype="multipart/form-data">
+      <input type="hidden" id="edit-hymn-id">
+
+      <!-- Metadatos -->
+      <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem;">
+        <div style="flex: 2; min-width: 200px;">
+          <label class="field-label" for="edit-hymn-title">Título del Himno</label>
+          <input type="text" id="edit-hymn-title" class="search-input" required>
+        </div>
+        <div style="flex: 1; min-width: 120px;">
+          <label class="field-label" for="edit-hymn-key">Tono (Clave)</label>
+          <input type="text" id="edit-hymn-key" class="search-input">
+        </div>
+        <div style="flex: 1; min-width: 150px;">
+          <label class="field-label" for="edit-hymn-version">Versión / Himnario</label>
+          <input type="text" id="edit-hymn-version" class="search-input">
+        </div>
+        <div style="flex: 1; min-width: 130px;">
+          <label class="field-label" for="edit-hymn-access">Acceso</label>
+          <select id="edit-hymn-access" class="select-input" required>
+            <option value="public">Público</option>
+            <option value="private">Privado</option>
+            <option value="hidden">Oculto</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Grilla de archivos (remplazar/añadir) -->
+      <div style="margin-bottom: 1.5rem;">
+        <h4 style="margin: 0 0 0.75rem; font-size: 0.95rem; color: #475569; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.25rem;">Reemplazar / Añadir Archivos</h4>
+        <div class="voice-files-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; max-height: 250px; overflow-y: auto; padding: 0.25rem;">
+          
+          <div id="edit-voice-files-container" style="display: contents;">
+            <!-- Controles inyectados dinámicamente por JS -->
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Botones -->
+      <div style="display: flex; gap: 1rem; justify-content: flex-end; align-items: center;">
+        <span id="edit-hymn-status" style="font-size: 0.85rem; color: #475569;"></span>
+        <button type="button" id="btn-edit-hymn-cancel" class="btn btn-ghost">Cancelar</button>
+        <button type="submit" id="btn-edit-hymn-submit" class="btn btn-primary" style="min-width: 140px; display: flex; align-items: center; justify-content: center; gap: 0.5rem; height: 40px;">
+          <span class="btn-text">Guardar Cambios</span>
+          <span class="spinner hidden"></span>
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>

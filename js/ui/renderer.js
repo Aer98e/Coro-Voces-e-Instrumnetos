@@ -4,7 +4,6 @@
  */
 
 import CONSTANTS from "../config/constants.js";
-import { selectCategoria, panelResultados } from "../config/selectors.js";
 import { capitalizar } from "../utils/formatters.js";
 import { crearTarjetaHimno } from "./components/hymnCard.js";
 import { mostrarError } from "./errorHandler.js";
@@ -14,6 +13,9 @@ import { mostrarError } from "./errorHandler.js";
  * @param {Array} categorias - Lista de categorías a renderizar
  */
 export function renderizarCategorias(categorias) {
+  const selectCategoria = document.getElementById("category-select");
+  if (!selectCategoria) return;
+
   const opciones = categorias
     .map(categoria => `<option value="${categoria}">${capitalizar(categoria)}</option>`)
     .join("");
@@ -26,6 +28,9 @@ export function renderizarCategorias(categorias) {
  * @param {Array} lista - Lista de himnos a renderizar
  */
 export function renderizarResultados(lista) {
+  const panelResultados = document.querySelector(".results-panel");
+  if (!panelResultados) return;
+
   panelResultados.innerHTML = `<h2 class="${CONSTANTS.CSS_CLASSES.SECTION_TITLE}">Resultados</h2>`;
 
   const fragmento = document.createDocumentFragment();

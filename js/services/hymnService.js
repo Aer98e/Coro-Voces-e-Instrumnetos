@@ -19,7 +19,14 @@ function transformarHimno(hymn, voiceRelations = [], categoryRelations = []) {
     tono: hymn.hymn_key || "Desconocido",
     fecha_registro: hymn.register,
     categorias: categoryRelations
-      .map(rel => rel.categories?.category_name)
+      .map(rel => {
+        const cat = rel.categories;
+        if (!cat) return null;
+        if (cat.type === 'group' && cat.groups?.group_name) {
+          return `${cat.category_name} (${cat.groups.group_name})`;
+        }
+        return cat.category_name;
+      })
       .filter(Boolean),
     versiones: voiceRelations
       .map(rel => ({
@@ -101,10 +108,10 @@ export async function cargarHimnos() {
 
     if (voiceError) throw voiceError;
 
-    // Consultar categorías (con relación a categories)
+    // Consultar categorías (con relación a categories y groups)
     const { data: categoryRelations, error: categoryError } = await supabase
       .from("hymn_category")
-      .select("hymn_id, categories(id, category_name)")
+      .select("hymn_id, categories(id, category_name, type, groups(group_name))")
       .in("hymn_id", hymnIds);
 
     if (categoryError) throw categoryError;
@@ -148,11 +155,24 @@ export async function cargarCategoriasUnicas() {
   try {
     const { data, error } = await supabase
       .from("categories")
-      .select("category_name")
+      .select("category_name, type, groups(group_name)")
       .order("category_name", { ascending: true });
 
     if (error) throw error;
-    return data.map(row => row.category_name);
+    
+    const unique = [];
+    const seen = new Set();
+    for (const row of data) {
+      let label = row.category_name;
+      if (row.type === 'group' && row.groups?.group_name) {
+        label = `${row.category_name} (${row.groups.group_name})`;
+      }
+      if (!seen.has(label)) {
+        seen.add(label);
+        unique.push(label);
+      }
+    }
+    return unique;
   } catch (error) {
     console.error("Error cargando categorías desde Supabase:", error);
     throw error;
