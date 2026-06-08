@@ -287,9 +287,24 @@ body {
   width: 100%;
 }
 
-/* --------- Responsivo --------- */
-
 @media (max-width: 640px) {
+  .container {
+    padding: 0 1rem;
+  }
+
+  .header-content {
+    flex-wrap: nowrap;
+    gap: 1rem;
+  }
+
+  .site-title {
+    font-size: 1.4rem;
+  }
+
+  .site-subtitle {
+    font-size: 0.8rem;
+  }
+
   .hymn-main {
     flex-direction: column;
     align-items: stretch;
