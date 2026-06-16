@@ -11,6 +11,7 @@ Contiene la información de los perfiles de usuario y sus roles dentro de la apl
 * **id**: `uuid` (No nulo, Llave Primaria, vinculada a `auth.users`)
 * **email**: `text` (Permite nulos)
 * **role**: `app_role` (No nulo, valor por defecto: `'member'::app_role`)
+* **defauld_voice_id**: `integer` (Permite nulos, Llave Foránea a `voices(id)`, voz seleccionada por defecto para el usuario)
 
 ### `hymns`
 Registros de los himnos del repertorio.
@@ -110,6 +111,18 @@ Todas las tablas y buckets tienen habilitado RLS para garantizar la integridad y
   * Archivos de himnos públicos y privados son visibles para usuarios autenticados.
   * Administradores tienen acceso total a todos los archivos.
 * **Escritura (INSERT/UPDATE/DELETE)**: Restringido únicamente al rol de administrador.
+
+### 9. `profiles`
+* **Lectura (SELECT)**: Los usuarios pueden leer perfiles públicos o la lógica del sistema lee el perfil del usuario autenticado.
+* **Modificación (UPDATE)**: Permitido para que cualquier usuario autenticado modifique únicamente su propio perfil (por ejemplo, para cambiar su voz por defecto):
+  ```sql
+  CREATE POLICY "Usuario modifica su propia voz"
+  ON public.profiles
+  FOR UPDATE
+  TO authenticated
+  USING (id = auth.uid())
+  WITH CHECK (id = auth.uid());
+  ```
 
 ---
 

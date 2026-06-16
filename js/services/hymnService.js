@@ -179,8 +179,29 @@ export async function cargarCategoriasUnicas() {
   }
 }
 
+/**
+ * Carga todas las voces desde Supabase
+ * @returns {Promise<Array>} Promesa con la lista de voces
+ * @throws {Error} Si hay error al cargar los datos
+ */
+export async function cargarVoces() {
+  try {
+    const { data, error } = await supabase
+      .from("voices")
+      .select("id, voice_name")
+      .order("id", { ascending: true });
+
+    if (error) throw error;
+    return data || [];
+  } catch (error) {
+    console.error("Error cargando voces desde Supabase:", error);
+    throw error;
+  }
+}
+
 export default {
   cargarHimnos,
   cargarCategoriasUnicas,
-  generarURLFirmada
+  generarURLFirmada,
+  cargarVoces
 };

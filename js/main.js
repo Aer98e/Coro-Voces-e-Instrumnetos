@@ -9,6 +9,7 @@ import { initRouter, handleRouteChange } from "./router.js";
 // Estado global
 let currentSession = null;
 let currentRole = 'member';
+let currentDefaultVoice = null;
 
 // Selectores globales (fuera de las vistas dinámicas)
 const authWidget = document.getElementById("auth-widget");
@@ -145,6 +146,56 @@ function actualizarHeaderUI(user, role) {
 }
 
 /**
+ * Obtiene el rol y la voz por defecto del usuario desde su perfil
+ * @param {string} userId - ID del usuario
+ * @returns {Promise<Object>} Objeto con { role, defaultVoice }
+ */
+async function obtenerPerfilUsuario(userId) {
+  try {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('role, defauld_voice_id')
+      .eq('id', userId)
+      .single();
+
+    if (error) throw error;
+    if (!data) return { role: 'member', defaultVoice: null };
+
+    let defaultVoice = null;
+    if (data.defauld_voice_id) {
+      const { data: voiceData, error: voiceError } = await supabase
+        .from('voices')
+        .select('voice_name')
+        .eq('id', data.defauld_voice_id)
+        .single();
+      
+      if (!voiceError && voiceData) {
+        defaultVoice = voiceData.voice_name;
+      }
+    }
+
+    return { role: data.role || 'member', defaultVoice };
+  } catch (error) {
+    console.error("❌ Error obteniendo perfil del usuario:", error);
+    return { role: 'member', defaultVoice: null };
+  }
+}
+
+/**
+ * Devuelve la voz por defecto actual del usuario
+ */
+export function getDefaultVoice() {
+  return currentDefaultVoice;
+}
+
+/**
+ * Establece la voz por defecto actual del usuario en memoria
+ */
+export function setDefaultVoice(voiceName) {
+  currentDefaultVoice = voiceName;
+}
+
+/**
  * Devuelve la sesión y el rol actuales (usado por el router)
  */
 export async function getSessionAndRole() {
@@ -175,17 +226,12 @@ async function inicializar() {
     const { data: { session } } = await supabase.auth.getSession();
     currentSession = session;
     currentRole = 'member';
+    currentDefaultVoice = null;
 
     if (session?.user) {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', session.user.id)
-        .single();
-
-      if (!error && data) {
-        currentRole = data.role;
-      }
+      const perfil = await obtenerPerfilUsuario(session.user.id);
+      currentRole = perfil.role;
+      currentDefaultVoice = perfil.defaultVoice;
     }
     actualizarHeaderUI(currentSession?.user || null, currentRole);
     await handleRouteChange(currentSession, currentRole);
@@ -208,20 +254,15 @@ async function inicializar() {
     const user = session?.user || null;
     currentSession = session;
     currentRole = 'member';
+    currentDefaultVoice = null;
 
     if (user) {
       try {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', user.id)
-          .single();
-
-        if (!error && data) {
-          currentRole = data.role;
-        }
+        const perfil = await obtenerPerfilUsuario(user.id);
+        currentRole = perfil.role;
+        currentDefaultVoice = perfil.defaultVoice;
       } catch (e) {
-        console.warn("⚠️ No se pudo obtener el rol del usuario en cambio de auth, por defecto 'member':", e);
+        console.warn("⚠️ No se pudo obtener el perfil del usuario en cambio de auth, por defecto 'member':", e);
       }
       actualizarHeaderUI(user, currentRole);
     } else {

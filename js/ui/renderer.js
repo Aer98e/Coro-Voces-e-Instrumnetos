@@ -26,8 +26,9 @@ export function renderizarCategorias(categorias) {
 /**
  * Renderiza los resultados de búsqueda
  * @param {Array} lista - Lista de himnos a renderizar
+ * @param {string} defaultVoice - Voz por defecto del usuario
  */
-export function renderizarResultados(lista) {
+export function renderizarResultados(lista, defaultVoice) {
   const panelResultados = document.querySelector(".results-panel");
   if (!panelResultados) return;
 
@@ -44,7 +45,7 @@ export function renderizarResultados(lista) {
   }
 
   lista.forEach(himno => {
-    const tarjeta = crearTarjetaHimno(himno);
+    const tarjeta = crearTarjetaHimno(himno, defaultVoice);
     fragmento.appendChild(tarjeta);
   });
 

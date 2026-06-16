@@ -2,6 +2,7 @@ import { cargarHimnos, cargarCategoriasUnicas } from "../services/hymnService.js
 import { filtrarHimnos, ordenarHimnos } from "../domain/hymn.js";
 import { renderizarCategorias, renderizarResultados } from "./renderer.js";
 import { mostrarError } from "./errorHandler.js";
+import { getDefaultVoice } from "../main.js";
 
 // Estado local de la vista
 let himnos = [];
@@ -21,7 +22,8 @@ export async function initHomeView() {
     let filtrados = filtrarHimnos(himnos, texto, categoria);
     filtrados = ordenarHimnos(filtrados, orden);
 
-    renderizarResultados(filtrados);
+    const defaultVoice = getDefaultVoice();
+    renderizarResultados(filtrados, defaultVoice);
   };
 
   inputBusqueda.addEventListener("input", actualizar);

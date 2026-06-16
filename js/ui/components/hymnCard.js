@@ -13,11 +13,12 @@ import { generarURLFirmada } from "../../services/hymnService.js";
 /**
  * Crea una tarjeta de himno completa
  * @param {Object} himno - Objeto himno
+ * @param {string} defaultVoice - Voz por defecto del usuario
  * @returns {HTMLElement} Elemento tarjeta de himno
  */
-export function crearTarjetaHimno(himno) {
+export function crearTarjetaHimno(himno, defaultVoice) {
   const categorias = obtenerCategorias(himno);
-  let versionSeleccionada = obtenerVersionPorVoz(himno);
+  let versionSeleccionada = obtenerVersionPorVoz(himno, defaultVoice);
 
   const tarjeta = document.createElement("article");
   tarjeta.className = CONSTANTS.CSS_CLASSES.HYMN_CARD;
