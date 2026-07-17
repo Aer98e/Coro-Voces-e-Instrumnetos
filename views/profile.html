@@ -11,7 +11,10 @@
           <span id="profile-avatar-initial" class="avatar-initial">?</span>
         </div>
         <div class="profile-details">
-          <p class="field-label">Correo Electrónico</p>
+          <p class="field-label">Nombre</p>
+          <h3 id="profile-name" class="profile-value">Cargando...</h3>
+
+          <p class="field-label" style="margin-top: 1rem;">Correo Electrónico</p>
           <h3 id="profile-email" class="profile-value">Cargando...</h3>
           
           <p class="field-label" style="margin-top: 1rem;">Nivel de Acceso</p>
@@ -29,43 +32,116 @@
       </div>
     </section>
 
-    <section class="password-panel">
-      <h2 class="section-title">Seguridad</h2>
-      
-      <form id="password-change-form" class="password-card">
-        <p class="modal-subtitle-login" style="margin-bottom: 1.5rem; text-align: left;">Actualiza tu contraseña para mantener tu cuenta segura.</p>
-        
-        <div class="form-group-login">
-          <label for="new-password" class="field-label">Nueva Contraseña</label>
-          <input
-            id="new-password"
-            type="password"
-            class="search-input"
-            placeholder="Mínimo 6 caracteres"
-            required
-            minlength="6"
-          >
-        </div>
-        
-        <div class="form-group-login">
-          <label for="confirm-password" class="field-label">Confirmar Contraseña</label>
-          <input
-            id="confirm-password"
-            type="password"
-            class="search-input"
-            placeholder="Repite la nueva contraseña"
-            required
-            minlength="6"
-          >
-        </div>
-        
-        <div id="password-error" class="login-error-message hidden"></div>
-        <div id="password-success" class="login-success-message hidden"></div>
-        
-        <button type="submit" id="btn-password-submit" class="btn btn-login-submit" style="margin-top: 1rem;">
-          <span class="btn-text">Actualizar Contraseña</span>
-          <span class="spinner hidden"></span>
+    <section class="password-panel" id="profile-edit-section">
+      <!-- 1. Estado inicial (Bloqueado) -->
+      <div id="edit-state-locked">
+        <h2 class="section-title">Cuenta y Seguridad</h2>
+        <p class="modal-subtitle-login" style="margin-bottom: 1.5rem; text-align: left; line-height: 1.5;">
+          Para actualizar tus datos personales (Nombre y Correo Electrónico) o cambiar tu contraseña, primero debes desbloquear la edición verificando tu identidad.
+        </p>
+        <button id="btn-unlock-edit" class="btn btn-login-submit" style="width: 100%;">
+          Desbloquear Edición
         </button>
+      </div>
+
+      <!-- 2. Estado de Verificación -->
+      <form id="verification-form" class="password-card hidden">
+        <h2 class="section-title">Verificar Identidad</h2>
+        <p class="modal-subtitle-login" style="margin-bottom: 1.5rem; text-align: left;">
+          Por motivos de seguridad, ingresa tu contraseña actual para continuar:
+        </p>
+        
+        <div class="form-group-login">
+          <label for="current-password" class="field-label">Contraseña Actual</label>
+          <input
+            id="current-password"
+            type="password"
+            class="search-input"
+            placeholder="••••••••"
+            required
+          >
+        </div>
+        
+        <div id="verify-error" class="login-error-message hidden" style="margin-top: 1rem;"></div>
+        
+        <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+          <button type="submit" id="btn-verify-submit" class="btn btn-login-submit" style="flex: 1; margin-top: 0;">
+            <span class="btn-text">Verificar</span>
+            <span class="spinner hidden"></span>
+          </button>
+          <button type="button" id="btn-verify-cancel" class="btn btn-ghost" style="flex: 1;">
+            Cancelar
+          </button>
+        </div>
+      </form>
+
+      <!-- 3. Estado de Edición (Desbloqueado) -->
+      <form id="profile-edit-form" class="password-card hidden">
+        <h2 class="section-title">Editar Perfil</h2>
+        <p class="modal-subtitle-login" style="margin-bottom: 1.5rem; text-align: left; color: var(--success-color, #10b981); font-weight: 500;">
+          ✓ Identidad verificada. Puedes editar los siguientes campos:
+        </p>
+        
+        <div class="form-group-login">
+          <label for="edit-name" class="field-label">Nombre Completo</label>
+          <input
+            id="edit-name"
+            type="text"
+            class="search-input"
+            placeholder="Tu nombre completo"
+            required
+          >
+        </div>
+
+        <div class="form-group-login">
+          <label for="edit-email" class="field-label">Correo Electrónico</label>
+          <input
+            id="edit-email"
+            type="email"
+            class="search-input"
+            placeholder="correo@ejemplo.com"
+            required
+          >
+        </div>
+
+        <div style="border-top: 1px solid #e2e8f0; margin: 1.5rem 0; padding-top: 1rem;">
+          <h4 style="margin: 0 0 1rem; font-size: 0.9rem; font-weight: 600; color: #475569;">Cambiar Contraseña (Opcional)</h4>
+          
+          <div class="form-group-login">
+            <label for="edit-new-password" class="field-label">Nueva Contraseña</label>
+            <input
+              id="edit-new-password"
+              type="password"
+              class="search-input"
+              placeholder="Mínimo 6 caracteres"
+              minlength="6"
+            >
+          </div>
+
+          <div class="form-group-login">
+            <label for="edit-confirm-password" class="field-label">Confirmar Nueva Contraseña</label>
+            <input
+              id="edit-confirm-password"
+              type="password"
+              class="search-input"
+              placeholder="Repite la nueva contraseña"
+              minlength="6"
+            >
+          </div>
+        </div>
+
+        <div id="edit-error" class="login-error-message hidden" style="margin-top: 1rem;"></div>
+        <div id="edit-success" class="login-success-message hidden" style="margin-top: 1rem;"></div>
+
+        <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+          <button type="submit" id="btn-edit-submit" class="btn btn-login-submit" style="flex: 1; margin-top: 0;">
+            <span class="btn-text">Guardar</span>
+            <span class="spinner hidden"></span>
+          </button>
+          <button type="button" id="btn-edit-cancel" class="btn btn-ghost" style="flex: 1;">
+            Cancelar
+          </button>
+        </div>
       </form>
     </section>
   </div>
