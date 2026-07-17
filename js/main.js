@@ -5,6 +5,7 @@
 
 import supabase from "./config/supabase.js";
 import { initRouter, handleRouteChange } from "./router.js";
+import { initTemporaryEmailNotice } from "./ui/components/emailNotice.js";
 
 // Estado global
 let currentSession = null;
@@ -232,6 +233,7 @@ async function inicializar() {
       const perfil = await obtenerPerfilUsuario(session.user.id);
       currentRole = perfil.role;
       currentDefaultVoice = perfil.defaultVoice;
+      initTemporaryEmailNotice(session.user);
     }
     actualizarHeaderUI(currentSession?.user || null, currentRole);
     await handleRouteChange(currentSession, currentRole);
@@ -265,8 +267,11 @@ async function inicializar() {
         console.warn("⚠️ No se pudo obtener el perfil del usuario en cambio de auth, por defecto 'member':", e);
       }
       actualizarHeaderUI(user, currentRole);
+      initTemporaryEmailNotice(user);
     } else {
       actualizarHeaderUI(null, null);
+      const banner = document.getElementById("temp-email-notice-banner");
+      if (banner) banner.remove();
     }
 
     // Forzar re-evaluación de la ruta actual basada en la nueva sesión

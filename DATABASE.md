@@ -10,6 +10,7 @@ Esta documentación describe la estructura de la base de datos de Supabase, las 
 Contiene la información de los perfiles de usuario y sus roles dentro de la aplicación.
 * **id**: `uuid` (No nulo, Llave Primaria, vinculada a `auth.users`)
 * **email**: `text` (Permite nulos)
+* **name**: `text` (Permite nulos, nombre del usuario)
 * **role**: `app_role` (No nulo, valor por defecto: `'member'::app_role`)
 * **defauld_voice_id**: `integer` (Permite nulos, Llave Foránea a `voices(id)`, voz seleccionada por defecto para el usuario)
 
@@ -168,11 +169,12 @@ Se ejecuta automáticamente cuando se registra un usuario en Supabase Auth (`aut
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-  INSERT INTO public.profiles (id, email, role)
+  INSERT INTO public.profiles (id, email, role, name)
   VALUES (
     new.id, 
     new.email, 
-    'member' -- Todos los usuarios nuevos inician como miembros por defecto
+    'member', -- Todos los usuarios nuevos inician como miembros por defecto
+    coalesce(new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'name', '')
   );
   RETURN NEW;
 END;
@@ -182,4 +184,27 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+```
+
+### Disparador: Sincronización de Correo al Actualizar (`public.handle_update_user()`)
+Mantiene actualizado el campo `email` en la tabla pública `profiles` cuando el usuario cambia su correo electrónico en `auth.users`.
+```sql
+-- Función del Trigger
+CREATE OR REPLACE FUNCTION public.handle_update_user()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF (NEW.email IS DISTINCT FROM OLD.email) THEN
+    UPDATE public.profiles
+    SET email = NEW.email
+    WHERE id = NEW.id;
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Trigger
+CREATE OR REPLACE TRIGGER on_auth_user_updated
+  AFTER UPDATE ON auth.users
+  FOR EACH ROW
+  EXECUTE FUNCTION public.handle_update_user();
 ```
