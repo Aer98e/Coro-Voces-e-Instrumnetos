@@ -37,17 +37,18 @@ export async function initHomeView() {
     }
   });
 
-  // Ocultar el teclado móvil al tocar la zona de resultados
+  // Ocultar el teclado móvil del buscador al tocar la zona de resultados
   const panelResultados = document.querySelector(".results-panel");
   if (panelResultados) {
-    const desmarcarEnfoque = () => {
-      if (document.activeElement && (document.activeElement.tagName === "INPUT" || document.activeElement.tagName === "SELECT")) {
-        document.activeElement.blur();
+    const desmarcarBuscador = () => {
+      if (document.activeElement === inputBusqueda) {
+        inputBusqueda.blur();
       }
     };
-    panelResultados.addEventListener("touchstart", desmarcarEnfoque, { passive: true });
-    panelResultados.addEventListener("click", desmarcarEnfoque);
+    panelResultados.addEventListener("touchstart", desmarcarBuscador, { passive: true });
+    panelResultados.addEventListener("click", desmarcarBuscador);
   }
+
 
   // Cargar datos
   try {
