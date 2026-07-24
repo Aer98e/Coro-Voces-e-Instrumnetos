@@ -51,6 +51,14 @@ export async function initProfileView(session, role) {
       if (avatarEl) {
         avatarEl.textContent = (profileData?.name || session.user.email).charAt(0).toUpperCase();
       }
+
+      // Evaluar aviso de correo aer98e.com en rojo pequeño
+      const isTempEmail = session.user.email?.toLowerCase().endsWith("@aer98e.com");
+      const warningCard = document.getElementById("email-warning-profile-card");
+      const warningEdit = document.getElementById("email-warning-edit-form");
+      if (warningCard) warningCard.classList.toggle("hidden", !isTempEmail);
+      if (warningEdit) warningEdit.classList.toggle("hidden", !isTempEmail);
+
     } catch (err) {
       console.error("❌ Error cargando datos del perfil:", err);
       if (emailEl) emailEl.textContent = session.user.email;
@@ -143,7 +151,44 @@ export async function initProfileView(session, role) {
   const btnEditSubmit = document.getElementById("btn-edit-submit");
   const btnEditCancel = document.getElementById("btn-edit-cancel");
 
+  const btnTogglePassword = document.getElementById("btn-toggle-password-fields");
+  const passwordInputsContainer = document.getElementById("password-inputs-container");
+
+  const emailVerificationSentScreen = document.getElementById("email-verification-sent-screen");
+  const btnVerificationScreenOk = document.getElementById("btn-verification-screen-ok");
+
   if (!lockedStateEl || !verificationForm || !editForm) return;
+
+  let isPasswordChangeActive = false;
+
+  const resetPasswordToggle = () => {
+    isPasswordChangeActive = false;
+    if (passwordInputsContainer) passwordInputsContainer.classList.add("hidden");
+    if (btnTogglePassword) {
+      btnTogglePassword.textContent = "🔑 Cambiar contraseña";
+      btnTogglePassword.style.backgroundColor = "#f1f5f9";
+      btnTogglePassword.style.color = "#334155";
+      btnTogglePassword.style.borderColor = "#cbd5e1";
+    }
+    if (editNewPasswordInput) editNewPasswordInput.value = "";
+    if (editConfirmPasswordInput) editConfirmPasswordInput.value = "";
+  };
+
+  if (btnTogglePassword && passwordInputsContainer) {
+    btnTogglePassword.addEventListener("click", () => {
+      isPasswordChangeActive = !isPasswordChangeActive;
+      passwordInputsContainer.classList.toggle("hidden", !isPasswordChangeActive);
+      if (isPasswordChangeActive) {
+        btnTogglePassword.textContent = "✖ Cancelar cambio de contraseña";
+        btnTogglePassword.style.backgroundColor = "#fee2e2";
+        btnTogglePassword.style.color = "#991b1b";
+        btnTogglePassword.style.borderColor = "#fca5a5";
+        if (editNewPasswordInput) editNewPasswordInput.focus();
+      } else {
+        resetPasswordToggle();
+      }
+    });
+  }
 
   // --- TRANSICIONES DE ESTADO ---
   
@@ -169,9 +214,19 @@ export async function initProfileView(session, role) {
     editForm.classList.add("hidden");
     lockedStateEl.classList.remove("hidden");
     editForm.reset();
+    resetPasswordToggle();
     editErrorMsg.classList.add("hidden");
     editSuccessMsg.classList.add("hidden");
   });
+
+  // Evento del botón "Entendido" en pantalla de verificación enviada
+  if (btnVerificationScreenOk && emailVerificationSentScreen) {
+    btnVerificationScreenOk.addEventListener("click", async () => {
+      emailVerificationSentScreen.classList.add("hidden");
+      lockedStateEl.classList.remove("hidden");
+      await cargarDatosPerfil();
+    });
+  }
 
   // --- SUBMIT VERIFICACIÓN ---
   verificationForm.addEventListener("submit", async (e) => {
@@ -201,12 +256,11 @@ export async function initProfileView(session, role) {
       // Éxito: pasar a modo edición
       verificationForm.classList.add("hidden");
       editForm.classList.remove("hidden");
+      resetPasswordToggle();
       
       // Rellenar campos de edición
       editNameInput.value = profileData?.name || "";
       editEmailInput.value = session.user.email;
-      editNewPasswordInput.value = "";
-      editConfirmPasswordInput.value = "";
       editNameInput.focus();
 
     } catch (err) {
@@ -228,11 +282,16 @@ export async function initProfileView(session, role) {
 
     const newName = editNameInput.value.trim();
     const newEmail = editEmailInput.value.trim();
-    const newPassword = editNewPasswordInput.value;
-    const confirmPassword = editConfirmPasswordInput.value;
+    const newPassword = editNewPasswordInput ? editNewPasswordInput.value : "";
+    const confirmPassword = editConfirmPasswordInput ? editConfirmPasswordInput.value : "";
 
-    // Validar contraseñas si el usuario ingresó algo en la nueva contraseña
-    if (newPassword || confirmPassword) {
+    // Validar contraseñas solo si el usuario activó la opción de cambiar contraseña
+    if (isPasswordChangeActive) {
+      if (!newPassword) {
+        editErrorMsg.textContent = "Por favor ingresa la nueva contraseña.";
+        editErrorMsg.classList.remove("hidden");
+        return;
+      }
       if (newPassword !== confirmPassword) {
         editErrorMsg.textContent = "Las nuevas contraseñas no coinciden.";
         editErrorMsg.classList.remove("hidden");
@@ -266,12 +325,12 @@ export async function initProfileView(session, role) {
       let emailChanged = false;
       let passwordChanged = false;
 
-      if (newEmail !== session.user.email) {
+      if (newEmail && newEmail.toLowerCase() !== session.user.email.toLowerCase()) {
         authUpdates.email = newEmail;
         emailChanged = true;
       }
 
-      if (newPassword) {
+      if (isPasswordChangeActive && newPassword) {
         authUpdates.password = newPassword;
         passwordChanged = true;
       }
@@ -281,34 +340,42 @@ export async function initProfileView(session, role) {
         if (authUpdateError) throw authUpdateError;
       }
 
-      // Mensaje de éxito
+      // Si cambió el correo electrónico, mostrar la pantalla destacada de confirmación
+      if (emailChanged) {
+        editForm.classList.add("hidden");
+        editForm.reset();
+        resetPasswordToggle();
+        if (emailVerificationSentScreen) {
+          emailVerificationSentScreen.classList.remove("hidden");
+        }
+        return;
+      }
+
+      // Mensaje de éxito si no cambió el correo
       let msg = "Perfil actualizado con éxito.";
-      if (emailChanged && passwordChanged) {
-        msg = "Se ha enviado un email al correo nuevo, se requiere tu confirmación. Tu contraseña también ha sido actualizada; por favor, vuelve a iniciar sesión con tu nueva contraseña cuando confirmes el correo.";
-      } else if (emailChanged) {
-        msg = "Se ha enviado un email al correo nuevo, se requiere tu confirmación.";
-      } else if (passwordChanged) {
+      if (passwordChanged) {
         msg = "Contraseña actualizada con éxito. Iniciando sesión de nuevo...";
       }
 
       editSuccessMsg.textContent = msg;
       editSuccessMsg.classList.remove("hidden");
       editForm.reset();
+      resetPasswordToggle();
 
-      // Si cambió la contraseña, forzar cierre de sesión después de 3 segundos
+      // Si cambió la contraseña, forzar cierre de sesión después de 3.5 segundos
       if (passwordChanged) {
         setTimeout(async () => {
           await supabase.auth.signOut();
           window.location.hash = '#/home';
         }, 3500);
       } else {
-        // Si no se cambió la contraseña, recargar los datos en el perfil local y regresar al estado bloqueado
+        // Si solo cambió el nombre, recargar los datos en el perfil local y regresar al estado bloqueado
         await cargarDatosPerfil();
         setTimeout(() => {
           editForm.classList.add("hidden");
           lockedStateEl.classList.remove("hidden");
           editSuccessMsg.classList.add("hidden");
-        }, 3000);
+        }, 2000);
       }
 
     } catch (err) {
@@ -322,3 +389,4 @@ export async function initProfileView(session, role) {
     }
   });
 }
+
