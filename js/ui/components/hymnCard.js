@@ -9,7 +9,6 @@ import { crearInfoHimno } from "./hymnInfo.js";
 import { crearSelectorVoces } from "./voiceSelector.js";
 import { crearReproductor } from "./audioPlayer.js";
 import { generarURLFirmada } from "../../services/hymnService.js";
-import { abrirVisorPDF } from "./pdfViewer.js";
 
 /**
  * Crea una tarjeta de himno completa
@@ -56,19 +55,19 @@ export function crearTarjetaHimno(himno, defaultVoice) {
   // Inicializar en '#' ya que se firmarán bajo demanda
   resetLinks();
 
-  // Ver PDF bajo demanda en visor modal integrado (sin cambiar de pestaña/página)
+  // Ver PDF bajo demanda en nueva pestaña
   verPdf.addEventListener("click", async (e) => {
-    e.preventDefault();
-    if (!versionSeleccionada.pdfPath) return;
-
-    let url = verPdf.getAttribute("href");
-    if (!url || url === "#") {
+    if (verPdf.getAttribute("href") === "#") {
+      e.preventDefault();
+      if (!versionSeleccionada.pdfPath) return;
+      
       verPdf.style.opacity = "0.5";
       verPdf.style.pointerEvents = "none";
       try {
-        url = await generarURLFirmada(versionSeleccionada.pdfPath, 1800);
+        const url = await generarURLFirmada(versionSeleccionada.pdfPath, 1800);
         if (url) {
           verPdf.href = url;
+          window.open(url, "_blank");
         }
       } catch (err) {
         console.error("Error al obtener partitura:", err);
@@ -77,12 +76,7 @@ export function crearTarjetaHimno(himno, defaultVoice) {
         verPdf.style.pointerEvents = "";
       }
     }
-
-    if (url && url !== "#") {
-      abrirVisorPDF(url, himno.titulo || "Partitura");
-    }
   });
-
 
   // Descargar PDF bajo demanda
   descargarPdf.addEventListener("click", async (e) => {
@@ -113,6 +107,11 @@ export function crearTarjetaHimno(himno, defaultVoice) {
 
   // Reproducir Audio bajo demanda
   audio.addEventListener("play", async () => {
+    // Quitar el foco de cualquier campo activo para ocultar el teclado en móviles
+    if (document.activeElement && typeof document.activeElement.blur === "function") {
+      document.activeElement.blur();
+    }
+
     if (!audioCargado && versionSeleccionada.audioPath) {
       audio.pause();
       audio.style.opacity = "0.5";
@@ -131,6 +130,7 @@ export function crearTarjetaHimno(himno, defaultVoice) {
       }
     }
   });
+
 
   // Agregar evento de cambio de voz
   voiceSelect.addEventListener("change", () => {

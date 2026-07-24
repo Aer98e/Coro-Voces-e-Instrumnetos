@@ -30,6 +30,25 @@ export async function initHomeView() {
   selectCategoria.addEventListener("change", actualizar);
   selectOrden.addEventListener("change", actualizar);
 
+  // Ocultar el teclado móvil al presionar Enter/Buscar
+  inputBusqueda.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      inputBusqueda.blur();
+    }
+  });
+
+  // Ocultar el teclado móvil al tocar la zona de resultados
+  const panelResultados = document.querySelector(".results-panel");
+  if (panelResultados) {
+    const desmarcarEnfoque = () => {
+      if (document.activeElement && (document.activeElement.tagName === "INPUT" || document.activeElement.tagName === "SELECT")) {
+        document.activeElement.blur();
+      }
+    };
+    panelResultados.addEventListener("touchstart", desmarcarEnfoque, { passive: true });
+    panelResultados.addEventListener("click", desmarcarEnfoque);
+  }
+
   // Cargar datos
   try {
     himnos = await cargarHimnos();
@@ -41,3 +60,4 @@ export async function initHomeView() {
     mostrarError(`No se pudieron cargar los datos. ${error.message}`);
   }
 }
+
