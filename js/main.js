@@ -253,7 +253,10 @@ async function inicializar() {
       return;
     }
 
+    const prevUserId = currentSession?.user?.id || null;
     const user = session?.user || null;
+    const newUserId = user?.id || null;
+
     currentSession = session;
     currentRole = 'member';
     currentDefaultVoice = null;
@@ -274,10 +277,12 @@ async function inicializar() {
       if (banner) banner.remove();
     }
 
-    // Forzar re-evaluación de la ruta actual basada en la nueva sesión
-    handleRouteChange(currentSession, currentRole);
+    // Solo forzar re-evaluación si cambió el usuario (login / logout)
+    const authUserChanged = prevUserId !== newUserId;
+    handleRouteChange(currentSession, currentRole, authUserChanged);
   });
 }
 
 // Iniciar la aplicación
 inicializar();
+

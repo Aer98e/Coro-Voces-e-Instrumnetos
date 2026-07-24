@@ -4,6 +4,9 @@ import { initProfileView } from "./ui/profileView.js";
 // Cache de las vistas para no hacer fetch múltiples veces
 const viewsCache = {};
 
+// Seguimiento de la ruta actualmente renderizada en el DOM
+let currentActiveRouteKey = null;
+
 /**
  * Carga el contenido HTML de una vista y lo inyecta en el DOM
  */
@@ -31,13 +34,22 @@ async function loadView(viewName) {
  * Maneja el cambio de ruta
  * @param {Object} session - La sesión actual de Supabase
  * @param {string} role - El rol actual del usuario
+ * @param {boolean} forceReload - Forzar la recarga del DOM aunque la ruta no haya cambiado
  */
-export async function handleRouteChange(session, role) {
+export async function handleRouteChange(session, role, forceReload = false) {
   const hash = window.location.hash || '#/home';
   const fullPath = hash.replace('#/', '');
   const pathParts = fullPath.split('/');
-  const path = pathParts[0];
+  const path = pathParts[0] || 'home';
   const subPath = pathParts[1] || '';
+
+  const routeKey = `${path}/${subPath}`;
+
+  // Si ya estamos en esta misma ruta y no se está forzando la recarga,
+  // NO modificar el DOM para preservar reproductores de audio activos.
+  if (!forceReload && currentActiveRouteKey === routeKey) {
+    return;
+  }
 
   // Guardianes de Ruta (Route Guards)
   if (path === 'perfil' && !session) {
@@ -49,6 +61,8 @@ export async function handleRouteChange(session, role) {
     window.location.hash = '#/home';
     return;
   }
+
+  currentActiveRouteKey = routeKey;
 
   // Cargar la vista correspondiente
   let viewLoaded = false;
@@ -84,3 +98,4 @@ export function initRouter(getSessionAndRole) {
     handleRouteChange(session, role);
   });
 }
+
