@@ -1,6 +1,6 @@
 /**
  * Componente Temporal: Aviso de correo ficticio (@aer98e.com)
- * Este archivo completo puede ser eliminado en unos días cuando la migración termine.
+ * Muestra un aviso corto y despliega una pantalla explicativa al interactuar.
  */
 export function initTemporaryEmailNotice(user) {
   // Eliminar banner previo si existe
@@ -16,24 +16,24 @@ export function initTemporaryEmailNotice(user) {
     return;
   }
 
-  // Crear el banner
+  // Crear el banner corto
   const banner = document.createElement("div");
   banner.id = "temp-email-notice-banner";
   banner.className = "temp-email-notice-banner fade-in";
   banner.innerHTML = `
     <div class="banner-inner container">
-      <div class="banner-text">
+      <div class="banner-text" id="btn-open-email-notice-text" style="cursor: pointer;">
         <span class="banner-icon">⚠️</span>
-        <span>Actualmente el correo asociado a esta cuenta no está asociado a un servicio real, se aconseja actualizar.</span>
+        <span>Se requiere que revise su correo asociado a esta cuenta.</span>
       </div>
       <div class="banner-actions">
-        <a href="#/perfil" class="btn btn-banner-action">Actualizar en mi Perfil</a>
+        <button id="btn-open-email-modal" class="btn btn-banner-action">Ver más</button>
         <button id="btn-close-temp-banner" class="btn-banner-close" aria-label="Cerrar aviso">&times;</button>
       </div>
     </div>
   `;
 
-  // Estilos CSS dinámicos específicos para este banner, facilitando su eliminación posterior
+  // Estilos CSS dinámicos específicos para este banner y la modal
   const styleId = "temp-email-notice-styles";
   if (!document.getElementById(styleId)) {
     const style = document.createElement("style");
@@ -63,13 +63,16 @@ export function initTemporaryEmailNotice(user) {
         gap: 0.5rem;
         line-height: 1.4;
       }
+      .temp-email-notice-banner .banner-text:hover {
+        text-decoration: underline;
+      }
       .temp-email-notice-banner .banner-icon {
         font-size: 1.2rem;
       }
       .temp-email-notice-banner .banner-actions {
         display: flex;
         align-items: center;
-        gap: 1rem;
+        gap: 0.75rem;
       }
       .temp-email-notice-banner .btn-banner-action {
         background-color: #d97706;
@@ -77,7 +80,8 @@ export function initTemporaryEmailNotice(user) {
         padding: 0.4rem 0.8rem;
         font-size: 0.8rem;
         border-radius: 0.375rem;
-        text-decoration: none;
+        border: none;
+        cursor: pointer;
         font-weight: 600;
         transition: background-color 0.2s, transform 0.1s;
         box-shadow: 0 2px 4px rgba(217, 119, 6, 0.2);
@@ -104,6 +108,31 @@ export function initTemporaryEmailNotice(user) {
       .temp-email-notice-banner .btn-banner-close:hover {
         color: #78350f;
       }
+
+      /* Modal explicativa */
+      .temp-email-modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(15, 23, 42, 0.6);
+        backdrop-filter: blur(4px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        padding: 1rem;
+      }
+      .temp-email-modal-card {
+        background: #ffffff;
+        border-radius: 0.75rem;
+        max-width: 500px;
+        width: 100%;
+        padding: 1.75rem;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        border: 1px solid #fef3c7;
+      }
     `;
     document.head.appendChild(style);
   }
@@ -116,9 +145,56 @@ export function initTemporaryEmailNotice(user) {
     document.body.prepend(banner);
   }
 
-  // Asignar evento de cierre
+  // Evento para abrir la modal explicativa
+  const abrirModalExplicativa = () => {
+    let modal = document.getElementById("temp-email-modal-overlay");
+    if (!modal) {
+      modal = document.createElement("div");
+      modal.id = "temp-email-modal-overlay";
+      modal.className = "temp-email-modal-overlay fade-in";
+      modal.innerHTML = `
+        <div class="temp-email-modal-card">
+          <h3 style="margin-top: 0; color: #b45309; display: flex; align-items: center; gap: 0.5rem; font-size: 1.25rem;">
+            <span>⚠️</span> Revisión de Correo Electrónico
+          </h3>
+          <div style="color: #374151; font-size: 0.95rem; line-height: 1.6; margin: 1.25rem 0 1.75rem;">
+            <p style="margin-bottom: 0.75rem;">
+              El correo registrado en su cuenta termina en <strong>@aer98e.com</strong>, el cual no es un correo electrónico real.
+            </p>
+            <p style="margin-bottom: 0;">
+              Para poder recuperar su contraseña en caso de olvido, recibir avisos y mantener la seguridad de su cuenta, se requiere que lo reemplace por un correo electrónico real.
+            </p>
+          </div>
+          <div style="display: flex; gap: 0.75rem; justify-content: flex-end; flex-wrap: wrap;">
+            <button id="btn-close-temp-modal" class="btn btn-ghost" style="padding: 0.5rem 1rem;">Cerrar</button>
+            <a href="#/perfil" id="btn-modal-go-profile" class="btn btn-login-submit" style="text-decoration: none; padding: 0.5rem 1rem; width: auto; margin-top: 0;">Ir a Mi Perfil</a>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+
+      const cerrarModal = () => {
+        modal.classList.add("hidden");
+      };
+
+      modal.querySelector("#btn-close-temp-modal").addEventListener("click", cerrarModal);
+      modal.querySelector("#btn-modal-go-profile").addEventListener("click", () => {
+        cerrarModal();
+      });
+      modal.addEventListener("click", (e) => {
+        if (e.target === modal) cerrarModal();
+      });
+    }
+    modal.classList.remove("hidden");
+  };
+
+  banner.querySelector("#btn-open-email-notice-text").addEventListener("click", abrirModalExplicativa);
+  banner.querySelector("#btn-open-email-modal").addEventListener("click", abrirModalExplicativa);
+
+  // Asignar evento de cierre del banner
   banner.querySelector("#btn-close-temp-banner").addEventListener("click", () => {
     banner.remove();
     sessionStorage.setItem("dismissed_temp_email_notice", "true");
   });
 }
+
