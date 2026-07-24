@@ -9,6 +9,7 @@ import { crearInfoHimno } from "./hymnInfo.js";
 import { crearSelectorVoces } from "./voiceSelector.js";
 import { crearReproductor } from "./audioPlayer.js";
 import { generarURLFirmada } from "../../services/hymnService.js";
+import { abrirVisorPDF } from "./pdfViewer.js";
 
 /**
  * Crea una tarjeta de himno completa
@@ -55,19 +56,19 @@ export function crearTarjetaHimno(himno, defaultVoice) {
   // Inicializar en '#' ya que se firmarán bajo demanda
   resetLinks();
 
-  // Ver PDF bajo demanda
+  // Ver PDF bajo demanda en visor modal integrado (sin cambiar de pestaña/página)
   verPdf.addEventListener("click", async (e) => {
-    if (verPdf.getAttribute("href") === "#") {
-      e.preventDefault();
-      if (!versionSeleccionada.pdfPath) return;
-      
+    e.preventDefault();
+    if (!versionSeleccionada.pdfPath) return;
+
+    let url = verPdf.getAttribute("href");
+    if (!url || url === "#") {
       verPdf.style.opacity = "0.5";
       verPdf.style.pointerEvents = "none";
       try {
-        const url = await generarURLFirmada(versionSeleccionada.pdfPath, 1800);
+        url = await generarURLFirmada(versionSeleccionada.pdfPath, 1800);
         if (url) {
           verPdf.href = url;
-          window.open(url, "_blank");
         }
       } catch (err) {
         console.error("Error al obtener partitura:", err);
@@ -76,7 +77,12 @@ export function crearTarjetaHimno(himno, defaultVoice) {
         verPdf.style.pointerEvents = "";
       }
     }
+
+    if (url && url !== "#") {
+      abrirVisorPDF(url, himno.titulo || "Partitura");
+    }
   });
+
 
   // Descargar PDF bajo demanda
   descargarPdf.addEventListener("click", async (e) => {
