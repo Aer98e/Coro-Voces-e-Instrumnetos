@@ -112,6 +112,14 @@ body {
   border-color: #1d4ed8;
 }
 
+.btn:disabled,
+.btn[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+  box-shadow: none !important;
+}
+
 /* --------- Etiquetas / Badges --------- */
 .badge {
   display: inline-flex;
@@ -123,8 +131,9 @@ body {
 }
 
 .badge-category {
-  background-color: #e0ecff;
-  color: #1d4ed8;
+  background-color: #fff7ed;
+  color: #c2410c;
+  border: 1px solid #fed7aa;
 }
 
 .badge-voice {

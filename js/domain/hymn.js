@@ -18,7 +18,7 @@ export function obtenerCategorias(himno) {
 }
 
 /**
- * Obtiene la versión de un himno para una voz específica
+ * Obtiene la versión de un himno para una voz específica con soporte para familias de voces (ej. Soprano 1 -> Soprano)
  * @param {Object} himno - Objeto himno
  * @param {string} voz - Voz a buscar (opcional)
  * @returns {Object} Versión del himno
@@ -31,10 +31,36 @@ export function obtenerVersionPorVoz(himno, voz) {
   if (!voz) {
     return versiones[0];
   }
-  const seleccion = versiones.find(
-    v => String(v.voz).toLowerCase() === String(voz).toLowerCase()
+
+  const vozNormalizada = String(voz).trim().toLowerCase();
+
+  // 1. Coincidencia exacta
+  const exacta = versiones.find(
+    v => String(v.voz).trim().toLowerCase() === vozNormalizada
   );
-  return seleccion || versiones[0];
+  if (exacta) return exacta;
+
+  // Helper para identificar la familia principal de la voz
+  const obtenerFamiliaVoz = (str) => {
+    const s = String(str || "").toLowerCase();
+    if (s.includes("soprano")) return "soprano";
+    if (s.includes("alto") || s.includes("contralto")) return "alto";
+    if (s.includes("tenor")) return "tenor";
+    if (s.includes("bajo")) return "bajo";
+    if (s.includes("piano")) return "piano";
+    if (s.includes("solo")) return "solo";
+    return s;
+  };
+
+  const familiaBuscada = obtenerFamiliaVoz(vozNormalizada);
+
+  // 2. Coincidencia por familia de voz (ej: Soprano -> Soprano 1, Alto -> Alto 1)
+  const porFamilia = versiones.find(v => {
+    const familiaVersion = obtenerFamiliaVoz(v.voz);
+    return familiaVersion === familiaBuscada;
+  });
+
+  return porFamilia || versiones[0];
 }
 
 /**
