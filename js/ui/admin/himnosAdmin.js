@@ -46,27 +46,29 @@ async function syncVoicesCatalog() {
  * Obtiene iniciales y clase CSS para insignias de voz en la tabla
  */
 function getVoiceBadgeInfo(voice) {
-  const name = voice.voice_name || "";
+  const rawName = voice.voice_name || "";
+  const name = rawName.toLowerCase();
   let label = "V";
   let badgeClass = "badge-voice-g";
 
-  if (name.includes("Soprano 1")) { label = "S1"; badgeClass = "badge-voice-s"; }
-  else if (name.includes("Soprano 2")) { label = "S2"; badgeClass = "badge-voice-s"; }
-  else if (name.includes("Soprano")) { label = "S"; badgeClass = "badge-voice-s"; }
-  else if (name.includes("Alto 1")) { label = "A1"; badgeClass = "badge-voice-a"; }
-  else if (name.includes("Alto 2")) { label = "A2"; badgeClass = "badge-voice-a"; }
-  else if (name.includes("Alto") || name.includes("Contralto")) { label = "A"; badgeClass = "badge-voice-a"; }
-  else if (name.includes("Tenor 1")) { label = "T1"; badgeClass = "badge-voice-t"; }
-  else if (name.includes("Tenor 2")) { label = "T2"; badgeClass = "badge-voice-t"; }
-  else if (name.includes("Tenor")) { label = "T"; badgeClass = "badge-voice-t"; }
-  else if (name.includes("Bajo 1")) { label = "B1"; badgeClass = "badge-voice-b"; }
-  else if (name.includes("Bajo 2")) { label = "B2"; badgeClass = "badge-voice-b"; }
-  else if (name.includes("Bajo")) { label = "B"; badgeClass = "badge-voice-b"; }
-  else if (name.includes("Piano")) { label = "P"; badgeClass = "badge-voice-p"; }
-  else if (name.includes("Solo")) { label = "O"; badgeClass = "badge-voice-o"; }
-  else { label = "G"; badgeClass = "badge-voice-g"; }
+  if (name.includes("soprano 1") || name.includes("soprano1")) { label = "S1"; badgeClass = "badge-voice-s"; }
+  else if (name.includes("soprano 2") || name.includes("soprano2")) { label = "S2"; badgeClass = "badge-voice-s"; }
+  else if (name.includes("soprano")) { label = "S"; badgeClass = "badge-voice-s"; }
+  else if (name.includes("alto 1") || name.includes("alto1")) { label = "A1"; badgeClass = "badge-voice-a"; }
+  else if (name.includes("alto 2") || name.includes("alto2")) { label = "A2"; badgeClass = "badge-voice-a"; }
+  else if (name.includes("alto") || name.includes("contralto")) { label = "A"; badgeClass = "badge-voice-a"; }
+  else if (name.includes("tenor 1") || name.includes("tenor1")) { label = "T1"; badgeClass = "badge-voice-t"; }
+  else if (name.includes("tenor 2") || name.includes("tenor2")) { label = "T2"; badgeClass = "badge-voice-t"; }
+  else if (name.includes("tenor")) { label = "T"; badgeClass = "badge-voice-t"; }
+  else if (name.includes("bajo 1") || name.includes("bajo1")) { label = "B1"; badgeClass = "badge-voice-b"; }
+  else if (name.includes("bajo 2") || name.includes("bajo2")) { label = "B2"; badgeClass = "badge-voice-b"; }
+  else if (name.includes("bajo")) { label = "B"; badgeClass = "badge-voice-b"; }
+  else if (name.includes("piano")) { label = "P"; badgeClass = "badge-voice-p"; }
+  else if (name.includes("solo")) { label = "O"; badgeClass = "badge-voice-o"; }
+  else if (name.includes("todos") || name.includes("general")) { label = "G"; badgeClass = "badge-voice-g"; }
+  else { label = rawName.charAt(0).toUpperCase() || "G"; badgeClass = "badge-voice-g"; }
 
-  return { label, badgeClass, name };
+  return { label, badgeClass, name: rawName };
 }
 
 /**
@@ -265,7 +267,7 @@ async function loadHymns() {
           <td>${h.hymn_key || '-'}</td>
           <td>${h.version_name || '-'}</td>
           <td>${accessBadge}</td>
-          <td>${voiceBadges}</td>
+          <td><div style="display: flex; flex-wrap: wrap; gap: 0.25rem; align-items: center; max-width: 240px;">${voiceBadges}</div></td>
           <td style="text-align: right;">
             <div style="display:flex; justify-content: flex-end; align-items:center;">
               <button class="btn-icon btn-edit-hymn" data-id="${h.id}" title="Editar Himno" style="font-size: 1.15rem; margin-right: 0.75rem;">✏️</button>
