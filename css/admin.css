@@ -705,13 +705,46 @@
 }
 
 @media (max-width: 768px) {
+  .admin-main-panel {
+    padding: 0.75rem 0.5rem;
+  }
+
+  .admin-card {
+    padding: 1rem 0.75rem;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  .groups-container,
+  .categories-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.85rem;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .group-card,
+  .category-card {
+    padding: 1rem 0.75rem;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Subvista de Vinculación de Himnos - Formato Plano en Móviles */
   .subview-container {
-    padding: 1rem;
+    padding: 0.5rem 0.25rem;
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
   }
 
   .hymns-columns-grid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.75rem;
   }
   
   .linking-mobile-tabs {
@@ -720,10 +753,31 @@
 
   .linking-column {
     display: none;
+    padding: 0.25rem 0;
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+    min-height: auto;
   }
 
   .linking-column.active-mobile-col {
     display: flex;
+  }
+
+  .linking-column-header {
+    background-color: #ffffff;
+    padding: 0.75rem;
+    border-radius: 0.6rem;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+    margin-bottom: 0.5rem;
+  }
+
+  .hymn-linking-item {
+    padding: 0.75rem 0.85rem;
+    border-radius: 0.6rem;
+    border-color: #e2e8f0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
   }
 }
 
