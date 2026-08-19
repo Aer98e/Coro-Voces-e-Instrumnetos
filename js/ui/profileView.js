@@ -11,12 +11,13 @@ export async function initProfileView(session, role) {
   const roleEl = document.getElementById("profile-role-badge");
   const avatarEl = document.getElementById("profile-avatar-initial");
 
-  // Cargamos el rol en texto legible
+  // Cargamos el rol en texto legible plano
   if (roleEl) {
     let roleText = 'Miembro';
     if (role === 'admin') roleText = 'Administrador';
     if (role === 'special') roleText = 'Usuario Especial';
     roleEl.textContent = roleText;
+    roleEl.className = "profile-value";
   }
 
   // Variable local para guardar los datos cargados del perfil
