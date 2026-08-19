@@ -156,7 +156,7 @@ async function loadCategories() {
     html += `
       <tr>
         <td style="font-weight: 600;">${cat.category_name}</td>
-        <td><span class="badge ${isGlobal ? 'badge-global' : 'badge-role'}">${isGlobal ? 'Global' : 'Grupo'}</span></td>
+        <td><span class="badge ${isGlobal ? 'badge-global' : 'badge-group'}">${isGlobal ? 'Global' : 'Grupo'}</span></td>
         <td>${asignedTo}</td>
         <td>${count} himno(s)</td>
         <td>
@@ -411,14 +411,14 @@ function renderHymnsChecklist() {
   container.innerHTML = allHymns.map(h => {
     const isChecked = currentLinkedHymnIds.has(h.id);
     const badgeText = h.access_level === 'private' ? 'Privado' : (h.access_level === 'hidden' ? 'Oculto' : 'Público');
-    const badgeClass = h.access_level === 'private' ? 'badge-voice' : (h.access_level === 'hidden' ? 'badge-role' : 'badge-category');
+    const badgeClass = h.access_level === 'private' ? 'badge-voice' : (h.access_level === 'hidden' ? 'badge-group' : 'badge-category');
     const normalizedTitle = normalizarTexto(h.title);
 
     return `
       <label class="hymn-checkbox-item" data-id="${h.id}" data-normalized="${normalizedTitle}">
         <input type="checkbox" class="hymn-checkbox-input" data-id="${h.id}" ${isChecked ? 'checked' : ''}>
         <span class="hymn-checkbox-label">${h.title}</span>
-        <span class="badge ${badgeClass} hymn-checkbox-badge" style="color:initial;">${badgeText}</span>
+        <span class="badge ${badgeClass} hymn-checkbox-badge">${badgeText}</span>
       </label>
     `;
   }).join('');
