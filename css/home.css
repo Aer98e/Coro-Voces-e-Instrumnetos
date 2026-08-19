@@ -26,16 +26,24 @@
   border-radius: 0.75rem;
   padding: 1.5rem 1.5rem 1.75rem;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .filters {
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .filter-group {
   flex: 1 1 140px;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 /* --------- Panel de resultados --------- */
@@ -247,4 +255,194 @@
   color: #6b7280;
   font-style: italic;
 }
+
+/* --------- Selector Personalizado y Modal de Filtrado por Categoría --------- */
+.custom-select-btn {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6rem 0.85rem;
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+  color: #1e293b;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s ease;
+  min-height: 42px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.custom-select-btn:hover {
+  border-color: #3a6ea5;
+  background-color: #f8fafc;
+}
+
+.custom-select-label {
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
+  margin-right: 0.5rem;
+  display: block;
+}
+
+.custom-select-label small {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.custom-select-arrow {
+  font-size: 0.75rem;
+  color: #64748b;
+  flex-shrink: 0;
+}
+
+.category-filter-card {
+  position: relative;
+  background: #ffffff;
+  border-radius: 0.85rem;
+  max-width: 480px;
+  width: 95%;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  padding: 1.25rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e5e7eb;
+}
+
+.category-filter-card .modal-close-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background-color: #f1f5f9;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  padding: 0;
+  line-height: 1;
+}
+
+.category-filter-card .modal-close-btn:hover {
+  background-color: #e2e8f0;
+  color: #0f172a;
+  transform: scale(1.08);
+}
+
+.category-filter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.85rem;
+}
+
+.category-filter-title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.category-filter-subtitle {
+  margin: 0.2rem 0 0;
+  font-size: 0.82rem;
+  color: #64748b;
+}
+
+.category-filter-search {
+  margin-bottom: 0.85rem;
+}
+
+.category-filter-options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  overflow-y: auto;
+  max-height: 380px;
+  padding-right: 0.2rem;
+}
+
+.category-option-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0.85rem;
+  border-radius: 0.5rem;
+  border: 1px solid #e2e8f0;
+  background-color: #ffffff;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.category-option-item:hover {
+  background-color: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+.category-option-item.active {
+  background-color: #f0f7ff;
+  border-color: #3a6ea5;
+}
+
+.category-option-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.category-option-name {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.category-option-group {
+  font-size: 0.78rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.category-option-group.global {
+  color: #0284c7;
+}
+
+.category-option-radio {
+  flex-shrink: 0;
+  margin-left: 0.75rem;
+}
+
+.radio-indicator {
+  width: 1.15rem;
+  height: 1.15rem;
+  border-radius: 50%;
+  border: 2px solid #cbd5e1;
+  display: inline-block;
+  transition: all 0.15s ease;
+}
+
+.radio-indicator.selected {
+  border-color: #2563eb;
+  background-color: #2563eb;
+  box-shadow: inset 0 0 0 3px #ffffff;
+}
+
 

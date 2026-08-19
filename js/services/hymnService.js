@@ -163,13 +163,17 @@ export async function cargarCategoriasUnicas() {
     const unique = [];
     const seen = new Set();
     for (const row of data) {
-      let label = row.category_name;
-      if (row.type === 'group' && row.groups?.group_name) {
-        label = `${row.category_name} (${row.groups.group_name})`;
-      }
+      const groupName = (row.type === 'group' && row.groups?.group_name) ? row.groups.group_name : null;
+      const label = groupName ? `${row.category_name} (${groupName})` : row.category_name;
+      
       if (!seen.has(label)) {
         seen.add(label);
-        unique.push(label);
+        unique.push({
+          name: row.category_name,
+          groupName: groupName,
+          type: row.type || 'global',
+          label: label
+        });
       }
     }
     return unique;

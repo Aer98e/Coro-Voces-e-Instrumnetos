@@ -1,11 +1,12 @@
 import { cargarHimnos, cargarCategoriasUnicas } from "../services/hymnService.js";
 import { filtrarHimnos, ordenarHimnos } from "../domain/hymn.js";
-import { renderizarCategorias, renderizarResultados } from "./renderer.js";
+import { renderizarCategorias, renderCategoryModalOptions, renderizarResultados } from "./renderer.js";
 import { mostrarError } from "./errorHandler.js";
 import { getDefaultVoice } from "../main.js";
 
 // Estado local de la vista
 let himnos = [];
+let categoriasCargadas = [];
 
 export async function initHomeView() {
   const inputBusqueda = document.getElementById("search-input");
@@ -30,6 +31,40 @@ export async function initHomeView() {
   selectCategoria.addEventListener("change", actualizar);
   selectOrden.addEventListener("change", actualizar);
 
+  // Configurar Modal de Filtro por Categoría
+  const btnOpenModal = document.getElementById("btn-open-category-filter");
+  const btnCloseModal = document.getElementById("btn-close-category-filter");
+  const categoryModal = document.getElementById("category-filter-modal");
+  const categoryModalSearch = document.getElementById("category-modal-search");
+
+  if (btnOpenModal && categoryModal) {
+    btnOpenModal.addEventListener("click", () => {
+      if (categoryModalSearch) categoryModalSearch.value = "";
+      renderCategoryModalOptions(categoriasCargadas);
+      categoryModal.classList.remove("hidden");
+    });
+  }
+
+  if (categoryModal) {
+    if (btnCloseModal) {
+      btnCloseModal.addEventListener("click", () => {
+        categoryModal.classList.add("hidden");
+      });
+    }
+
+    categoryModal.addEventListener("click", (e) => {
+      if (e.target === categoryModal) {
+        categoryModal.classList.add("hidden");
+      }
+    });
+  }
+
+  if (categoryModalSearch) {
+    categoryModalSearch.addEventListener("input", (e) => {
+      renderCategoryModalOptions(categoriasCargadas, e.target.value);
+    });
+  }
+
   // Ocultar el teclado móvil al presionar Enter/Buscar
   inputBusqueda.addEventListener("keydown", (e) => {
     if (e.key === "Enter") {
@@ -49,13 +84,12 @@ export async function initHomeView() {
     panelResultados.addEventListener("click", desmarcarBuscador);
   }
 
-
   // Cargar datos
   try {
     himnos = await cargarHimnos();
-    const categorias = await cargarCategoriasUnicas();
+    categoriasCargadas = await cargarCategoriasUnicas();
 
-    renderizarCategorias(categorias);
+    renderizarCategorias(categoriasCargadas);
     actualizar();
   } catch (error) {
     mostrarError(`No se pudieron cargar los datos. ${error.message}`);

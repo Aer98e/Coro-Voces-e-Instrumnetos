@@ -12,13 +12,14 @@
 
     <div class="filters">
       <div class="filter-group">
-        <label class="field-label" for="category-select">Categoría</label>
-        <select id="category-select" class="select-input">
-          <option value="">Todas</option>
-          <option value="himno">Himno</option>
-          <option value="especial">Especial</option>
-          <option value="navidad">Navidad</option>
+        <label class="field-label">Categoría</label>
+        <select id="category-select" class="select-input hidden" style="display:none;">
+          <option value="">Todas las categorías</option>
         </select>
+        <button type="button" id="btn-open-category-filter" class="custom-select-btn">
+          <span id="selected-category-label" class="custom-select-label">Todas las categorías</span>
+          <span class="custom-select-arrow">▼</span>
+        </button>
       </div>
 
       <div class="filter-group">
@@ -37,3 +38,25 @@
     <p class="loading-message">Cargando himnos...</p>
   </section>
 </div>
+
+<!-- Modal Personalizado para Filtrar por Categoría -->
+<div id="category-filter-modal" class="modal-overlay hidden">
+  <div class="category-filter-card fade-in">
+    <div class="category-filter-header">
+      <div>
+        <h3 class="category-filter-title">Seleccionar Categoría</h3>
+        <p class="category-filter-subtitle">Filtra la lista de himnos por categoría o grupo</p>
+      </div>
+      <button type="button" id="btn-close-category-filter" class="modal-close-btn">&times;</button>
+    </div>
+
+    <div class="category-filter-search">
+      <input type="text" id="category-modal-search" class="search-input" placeholder="🔍 Buscar categoría o grupo..." autocomplete="off" style="margin: 0; width: 100%;">
+    </div>
+
+    <div id="category-filter-options-list" class="category-filter-options-list">
+      <p class="loading-message">Cargando categorías...</p>
+    </div>
+  </div>
+</div>
+
