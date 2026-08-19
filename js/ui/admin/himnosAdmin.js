@@ -1,9 +1,14 @@
 import supabase from "../../config/supabase.js";
 import { cargarVoces } from "../../services/hymnService.js";
+import { showToast } from "../components/toast.js";
 
 let currentUserSession = null;
 let currentRole = null;
 let cachedVoicesCatalog = [];
+
+// Cache local para búsqueda instantánea en la tabla
+let allHymnsCache = [];
+let voiceLinksMapCache = {};
 
 const DEFAULT_VOICES_CATALOG = [
   { id: 1, voice_name: "Soprano" },
@@ -19,9 +24,6 @@ const DEFAULT_VOICES_CATALOG = [
   { id: 11, voice_name: "Alto 2" }
 ];
 
-/**
- * Asegura que la tabla voices en Supabase contenga el catálogo completo de voces (incluyendo Soprano 1, Soprano 2, Alto 1, Alto 2)
- */
 async function syncVoicesCatalog() {
   try {
     const dbVoices = await cargarVoces();
@@ -42,9 +44,6 @@ async function syncVoicesCatalog() {
   return cachedVoicesCatalog;
 }
 
-/**
- * Obtiene iniciales y clase CSS para insignias de voz en la tabla
- */
 function getVoiceBadgeInfo(voice) {
   const rawName = voice.voice_name || "";
   const name = rawName.toLowerCase();
@@ -71,9 +70,11 @@ function getVoiceBadgeInfo(voice) {
   return { label, badgeClass, name: rawName };
 }
 
-/**
- * Renderiza el grid de voces en el formulario de creación
- */
+function getVoiceNameById(id) {
+  const v = cachedVoicesCatalog.find(x => x.id === id);
+  return v ? v.voice_name : `voice_${id}`;
+}
+
 function renderCreateVoiceGrid(voices) {
   const container = document.getElementById("create-voice-files-container");
   if (!container) return;
@@ -111,9 +112,21 @@ export async function initHimnosAdmin(session, role) {
     return;
   }
 
-  // Sincronizar catálogo de voces e inicializar formulario de creación dinámico
   await syncVoicesCatalog();
   renderCreateVoiceGrid(cachedVoicesCatalog);
+
+  // Subvista: Transición entre tabla y formulario de agregar himno
+  document.getElementById("btn-open-add-hymn-subview")?.addEventListener("click", openAddHymnSubView);
+  document.getElementById("btn-back-to-hymns-list")?.addEventListener("click", closeAddHymnSubView);
+  document.getElementById("btn-cancel-create-hymn")?.addEventListener("click", closeAddHymnSubView);
+
+  // Buscador en tiempo real de la tabla de himnos
+  const searchInput = document.getElementById("hymns-search-input");
+  if (searchInput) {
+    searchInput.addEventListener("input", (e) => {
+      filterAndRenderHymnsTable(e.target.value);
+    });
+  }
 
   // Configurar listeners de creación
   const createForm = document.getElementById("create-hymn-form");
@@ -131,6 +144,8 @@ export async function initHimnosAdmin(session, role) {
         }
       });
     }
+    const cancelBtn = newForm.querySelector("#btn-cancel-create-hymn");
+    if (cancelBtn) cancelBtn.addEventListener("click", closeAddHymnSubView);
   }
 
   // Configurar listeners de edición (modal)
@@ -145,10 +160,33 @@ export async function initHimnosAdmin(session, role) {
     document.getElementById("btn-edit-hymn-cancel")?.addEventListener("click", cerrarEditHymnModal);
   }
 
-  // Configurar event delegation para los cambios de archivos
   setupFileChangeDelegators();
-
   await loadHymns();
+}
+
+function openAddHymnSubView() {
+  document.getElementById("himnos-main-view")?.classList.add("hidden");
+  document.getElementById("add-hymn-subview")?.classList.remove("hidden");
+}
+
+function closeAddHymnSubView() {
+  document.getElementById("add-hymn-subview")?.classList.add("hidden");
+  document.getElementById("himnos-main-view")?.classList.remove("hidden");
+
+  const form = document.getElementById("create-hymn-form");
+  if (form) {
+    form.reset();
+    form.querySelectorAll(".file-upload-btn").forEach(label => {
+      label.classList.remove("file-selected");
+      const isAudio = label.getAttribute("for")?.includes("audio");
+      label.innerHTML = `<span>${isAudio ? '🎵' : '📄'} +</span>`;
+    });
+    form.querySelectorAll(".file-name-text").forEach(nameText => {
+      nameText.textContent = "Sin archivo";
+      nameText.style.color = "";
+      nameText.style.fontWeight = "";
+    });
+  }
 }
 
 function setupFileChangeDelegators() {
@@ -214,10 +252,7 @@ async function loadHymns() {
 
     if (hymnsError) throw hymnsError;
 
-    if (!hymns || hymns.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No hay himnos registrados en el sistema.</td></tr>';
-      return;
-    }
+    allHymnsCache = hymns || [];
 
     const { data: voiceLinks, error: linksError } = await supabase
       .from("hymn_voice")
@@ -225,70 +260,96 @@ async function loadHymns() {
 
     if (linksError) throw linksError;
 
-    const linksMap = {};
+    voiceLinksMapCache = {};
     if (voiceLinks) {
       voiceLinks.forEach(link => {
-        if (!linksMap[link.hymn_id]) linksMap[link.hymn_id] = [];
-        linksMap[link.hymn_id].push(link);
+        if (!voiceLinksMapCache[link.hymn_id]) voiceLinksMapCache[link.hymn_id] = [];
+        voiceLinksMapCache[link.hymn_id].push(link);
       });
     }
 
-    tbody.innerHTML = hymns.map(h => {
-      const links = linksMap[h.id] || [];
-
-      const voiceBadges = cachedVoicesCatalog.map(voice => {
-        const link = links.find(l => l.voice_id === voice.id);
-        const { label, badgeClass, name } = getVoiceBadgeInfo(voice);
-
-        const hasAudio = !!link?.audio_url;
-        const hasPdf = !!link?.pdf_url;
-
-        if (!hasAudio && !hasPdf) {
-          return `<span class="badge" style="opacity: 0.25; margin-right: 0.2rem; cursor: default; user-select: none;" title="${name}: Sin archivos">${label}</span>`;
-        }
-
-        let titleStr = [];
-        if (hasAudio) titleStr.push("Audio");
-        if (hasPdf) titleStr.push("PDF");
-
-        return `<span class="badge ${badgeClass}" style="margin-right: 0.2rem; cursor: pointer;" title="${name}: ${titleStr.join(' y ')}">${label}</span>`;
-      }).join('');
-
-      const accessBadge = h.access_level === 'public'
-        ? `<span class="badge badge-global" style="color:initial;">Público</span>`
-        : (h.access_level === 'private'
-          ? `<span class="badge badge-voice" style="color:initial;">Privado</span>`
-          : `<span class="badge badge-voice-p" style="color:initial;">Oculto</span>`);
-
-      return `
-        <tr>
-          <td style="font-family: monospace; font-size: 0.85rem; color:#64748b;">${h.id}</td>
-          <td style="font-weight: 600;">${h.title}</td>
-          <td>${h.hymn_key || '-'}</td>
-          <td>${h.version_name || '-'}</td>
-          <td>${accessBadge}</td>
-          <td><div style="display: flex; flex-wrap: wrap; gap: 0.25rem; align-items: center; max-width: 240px;">${voiceBadges}</div></td>
-          <td style="text-align: right;">
-            <div style="display:flex; justify-content: flex-end; align-items:center;">
-              <button class="btn-icon btn-edit-hymn" data-id="${h.id}" title="Editar Himno" style="font-size: 1.15rem; margin-right: 0.75rem;">✏️</button>
-              <button class="btn-icon btn-delete-hymn" data-id="${h.id}" title="Eliminar Himno" style="font-size: 1.15rem;">🗑️</button>
-            </div>
-          </td>
-        </tr>
-      `;
-    }).join('');
-
-    tbody.querySelectorAll(".btn-edit-hymn").forEach(btn => {
-      btn.addEventListener("click", openEditHymnModal);
-    });
-
-    tbody.querySelectorAll(".btn-delete-hymn").forEach(btn => {
-      btn.addEventListener("click", handleDeleteHymn);
-    });
+    const currentSearchQuery = document.getElementById("hymns-search-input")?.value || "";
+    filterAndRenderHymnsTable(currentSearchQuery);
 
   } catch (err) {
     tbody.innerHTML = `<tr><td colspan="7" style="color:red; text-align:center;">Error: ${err.message}</td></tr>`;
   }
+}
+
+function filterAndRenderHymnsTable(query = '') {
+  const tbody = document.getElementById("hymns-table-body");
+  if (!tbody) return;
+
+  const normQuery = normalizarTexto(query);
+  let filtered = allHymnsCache;
+
+  if (normQuery !== '') {
+    filtered = allHymnsCache.filter(h => {
+      const title = normalizarTexto(h.title);
+      const id = String(h.id || '');
+      const key = normalizarTexto(h.hymn_key);
+      const version = normalizarTexto(h.version_name);
+      return title.includes(normQuery) || id.includes(normQuery) || key.includes(normQuery) || version.includes(normQuery);
+    });
+  }
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#64748b; padding:1.5rem 0;">No se encontraron himnos ${normQuery ? 'que coincidan' : 'registrados'}.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = filtered.map(h => {
+    const links = voiceLinksMapCache[h.id] || [];
+
+    const voiceBadges = cachedVoicesCatalog.map(voice => {
+      const link = links.find(l => l.voice_id === voice.id);
+      const { label, badgeClass, name } = getVoiceBadgeInfo(voice);
+
+      const hasAudio = !!link?.audio_url;
+      const hasPdf = !!link?.pdf_url;
+
+      if (!hasAudio && !hasPdf) {
+        return `<span class="badge" style="opacity: 0.25; margin-right: 0.2rem; cursor: default; user-select: none;" title="${name}: Sin archivos">${label}</span>`;
+      }
+
+      let titleStr = [];
+      if (hasAudio) titleStr.push("Audio");
+      if (hasPdf) titleStr.push("PDF");
+
+      return `<span class="badge ${badgeClass}" style="margin-right: 0.2rem; cursor: pointer;" title="${name}: ${titleStr.join(' y ')}">${label}</span>`;
+    }).join('');
+
+    const accessBadge = h.access_level === 'public'
+      ? `<span class="badge badge-global" style="color:initial;">Público</span>`
+      : (h.access_level === 'private'
+        ? `<span class="badge badge-voice" style="color:initial;">Privado</span>`
+        : `<span class="badge badge-voice-p" style="color:initial;">Oculto</span>`);
+
+    return `
+      <tr>
+        <td style="font-family: monospace; font-size: 0.85rem; color:#64748b;">${h.id}</td>
+        <td style="font-weight: 600;">${h.title}</td>
+        <td>${h.hymn_key || '-'}</td>
+        <td>${h.version_name || '-'}</td>
+        <td>${accessBadge}</td>
+        <td><div style="display: flex; flex-wrap: wrap; gap: 0.25rem; align-items: center; max-width: 240px;">${voiceBadges}</div></td>
+        <td style="text-align: right;">
+          <div style="display:flex; justify-content: flex-end; align-items:center;">
+            <button class="btn-icon btn-edit-hymn" data-id="${h.id}" title="Editar Himno" style="font-size: 1.15rem; margin-right: 0.75rem;">✏️</button>
+            <button class="btn-icon btn-delete-hymn" data-id="${h.id}" title="Eliminar Himno" style="font-size: 1.15rem;">🗑️</button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+
+  tbody.querySelectorAll(".btn-edit-hymn").forEach(btn => {
+    btn.addEventListener("click", openEditHymnModal);
+  });
+
+  tbody.querySelectorAll(".btn-delete-hymn").forEach(btn => {
+    btn.addEventListener("click", handleDeleteHymn);
+  });
 }
 
 async function handleCreateHymn(e) {
@@ -313,7 +374,6 @@ async function handleCreateHymn(e) {
     return;
   }
 
-  // Quitar estilo de error previo
   titleInput.style.borderColor = "";
 
   if (submitBtn) submitBtn.disabled = true;
@@ -417,39 +477,17 @@ async function handleCreateHymn(e) {
       }
     }
 
-    if (statusEl) {
-      statusEl.style.color = "#10b981";
-      statusEl.textContent = "✓ ¡Himno guardado con éxito!";
-    }
-    form.reset();
-    
-    form.querySelectorAll(".file-upload-btn").forEach(label => {
-      label.classList.remove("file-selected");
-      const isAudio = label.getAttribute("for").includes("audio");
-      label.innerHTML = `<span>${isAudio ? '🎵' : '📄'} +</span>`;
-    });
-    form.querySelectorAll(".file-name-text").forEach(nameText => {
-      nameText.textContent = "Sin archivo";
-      nameText.style.color = "";
-      nameText.style.fontWeight = "";
-    });
-
-    setTimeout(() => { 
-      if (statusEl) {
-        statusEl.textContent = ""; 
-        statusEl.style.color = "";
-      }
-    }, 4000);
-    
+    showToast(`Himno "${title}" registrado exitosamente.`, "success", "Himno Creado");
+    closeAddHymnSubView();
     await loadHymns();
 
   } catch (err) {
     console.error("Error al registrar himno:", err);
+    showToast(`Error al crear himno: ${err.message}`, "error", "Error");
     if (statusEl) {
       statusEl.style.color = "#ef4444";
       statusEl.textContent = `❌ Error: ${err.message || "No se pudo guardar"}`;
     }
-    alert("Error al registrar himno: " + (err.message || "Ocurrió un problema de conexión"));
   } finally {
     if (submitBtn) submitBtn.disabled = false;
     if (btnText) btnText.textContent = "Guardar Himno";
@@ -459,38 +497,24 @@ async function handleCreateHymn(e) {
 
 async function handleDeleteHymn(e) {
   const hymnId = e.currentTarget.getAttribute("data-id");
-  if (!confirm("¿Eliminar este himno permanentemente? Todos los audios y partituras asociados serán eliminados.")) return;
+  if (!confirm("¿Eliminar este himno permanentemente? Se eliminarán todas sus versiones de voz y vínculos.")) return;
 
   e.currentTarget.disabled = true;
 
   try {
-    const { data: links, error: fetchError } = await supabase
+    const { error: deleteVoicesError } = await supabase
       .from("hymn_voice")
-      .select("audio_url, pdf_url")
+      .delete()
       .eq("hymn_id", hymnId);
 
-    if (fetchError) throw fetchError;
+    if (deleteVoicesError) throw deleteVoicesError;
 
-    const filesToDelete = [];
-    if (links) {
-      links.forEach(l => {
-        if (l.audio_url) filesToDelete.push(l.audio_url);
-        if (l.pdf_url) filesToDelete.push(l.pdf_url);
-      });
-    }
+    const { error: deleteCategoriesError } = await supabase
+      .from("hymn_category")
+      .delete()
+      .eq("hymn_id", hymnId);
 
-    if (filesToDelete.length > 0) {
-      const { error: storageError } = await supabase.storage
-        .from("hymns")
-        .remove(filesToDelete);
-
-      if (storageError) {
-        console.warn("Advertencia al borrar del storage:", storageError.message);
-      }
-    }
-
-    await supabase.from("hymn_voice").delete().eq("hymn_id", hymnId);
-    await supabase.from("hymn_category").delete().eq("hymn_id", hymnId);
+    if (deleteCategoriesError) throw deleteCategoriesError;
 
     const { error: deleteHymnError } = await supabase
       .from("hymns")
@@ -499,199 +523,134 @@ async function handleDeleteHymn(e) {
 
     if (deleteHymnError) throw deleteHymnError;
 
+    showToast("Himno eliminado correctamente.", "info", "Himno Eliminado");
     await loadHymns();
 
   } catch (err) {
-    alert("Error al eliminar himno: " + err.message);
+    showToast(`Error al eliminar el himno: ${err.message}`, "error", "Error");
     e.currentTarget.disabled = false;
   }
 }
 
-// ---- Modal de Edición ---- //
-
 async function openEditHymnModal(e) {
   const hymnId = e.currentTarget.getAttribute("data-id");
-  
   const modal = document.getElementById("edit-hymn-modal");
-  const idInput = document.getElementById("edit-hymn-id");
-  const titleInput = document.getElementById("edit-hymn-title");
-  const keyInput = document.getElementById("edit-hymn-key");
-  const versionInput = document.getElementById("edit-hymn-version");
-  const accessSelect = document.getElementById("edit-hymn-access");
   const container = document.getElementById("edit-voice-files-container");
-  
-  container.innerHTML = "<p style='grid-column: 1/-1; text-align:center; color:#64748b;'>Cargando archivos del himno...</p>";
+  const statusEl = document.getElementById("edit-hymn-status");
+
+  if (!modal || !container) return;
+
+  document.getElementById("edit-hymn-id").value = hymnId;
+  document.getElementById("edit-hymn-title").value = "Cargando...";
+  document.getElementById("edit-hymn-key").value = "";
+  document.getElementById("edit-hymn-version").value = "";
+  if (statusEl) statusEl.textContent = "";
+
+  container.innerHTML = `<p style="grid-column: 1/-1; text-align:center; color:#64748b;">Cargando archivos del himno...</p>`;
   modal.classList.remove("hidden");
 
   try {
-    const { data: hymn, error: fetchHymnError } = await supabase
+    const { data: hymn, error: hymnError } = await supabase
       .from("hymns")
       .select("*")
       .eq("id", hymnId)
       .single();
 
-    if (fetchHymnError) throw fetchHymnError;
+    if (hymnError) throw hymnError;
 
-    idInput.value = hymn.id;
-    titleInput.value = hymn.title || "";
-    keyInput.value = hymn.hymn_key || "";
-    versionInput.value = hymn.version_name || "";
-    accessSelect.value = hymn.access_level || "public";
+    document.getElementById("edit-hymn-title").value = hymn.title || "";
+    document.getElementById("edit-hymn-key").value = hymn.hymn_key || "";
+    document.getElementById("edit-hymn-version").value = hymn.version_name || "";
+    document.getElementById("edit-hymn-access").value = hymn.access_level || "public";
 
-    const { data: voiceLinks, error: fetchLinksError } = await supabase
+    const { data: voiceLinks, error: linksError } = await supabase
       .from("hymn_voice")
-      .select("*")
+      .select("voice_id, audio_url, pdf_url")
       .eq("hymn_id", hymnId);
 
-    if (fetchLinksError) throw fetchLinksError;
+    if (linksError) throw linksError;
 
-    container.innerHTML = cachedVoicesCatalog.map(voice => {
-      const vId = voice.id;
-      const name = voice.voice_name;
-      const link = voiceLinks ? voiceLinks.find(l => l.voice_id === vId) : null;
-      
+    const linksMap = {};
+    if (voiceLinks) {
+      voiceLinks.forEach(l => { linksMap[l.voice_id] = l; });
+    }
+
+    container.innerHTML = cachedVoicesCatalog.map(v => {
+      const link = linksMap[v.id];
       const hasAudio = !!link?.audio_url;
       const hasPdf = !!link?.pdf_url;
 
+      const audioName = hasAudio ? link.audio_url.split('/').pop() : "Sin archivo";
+      const pdfName = hasPdf ? link.pdf_url.split('/').pop() : "Sin archivo";
+
       return `
-        <div style="background: #f8fafc; padding: 0.75rem; border-radius: 0.5rem; border: 1px solid #e2e8f0; display:flex; flex-direction:column; gap:0.25rem;">
-          <span style="font-weight: 600; font-size: 0.85rem; color: #1e293b;">${name}</span>
-          
+        <div style="background: #f8fafc; padding: 0.75rem; border-radius: 0.5rem; border: 1px solid #e2e8f0;">
+          <span style="font-weight: 600; font-size: 0.85rem; color: #1e293b; display: block; margin-bottom: 0.25rem;">${v.voice_name}</span>
           <div class="file-upload-row">
-            <!-- Audio MP3 -->
             <div class="file-upload-col">
-              <label class="file-upload-btn ${hasAudio ? 'file-selected' : ''}" for="edit-audio-voice-${vId}" title="Reemplazar o subir audio">
+              <label class="file-upload-btn ${hasAudio ? 'file-selected' : ''}" for="edit-audio-voice-${v.id}" title="Reemplazar audio de ${v.voice_name}">
                 <span>🎵 ${hasAudio ? '✓' : '+'}</span>
               </label>
-              <input type="file" id="edit-audio-voice-${vId}" class="edit-voice-audio-input hidden" data-voice="${vId}" accept="audio/mpeg,audio/mp3">
-              <span class="file-name-text" id="name-edit-audio-voice-${vId}">
-                ${hasAudio ? '<span style="color:#10b981; font-weight:600;">Subido</span>' : 'Sin archivo'}
-              </span>
-              ${hasAudio ? `<button type="button" class="btn btn-ghost btn-sm btn-delete-file" data-hymn="${hymnId}" data-voice="${vId}" data-type="audio" style="padding:0.1rem 0.3rem; margin-top:0.25rem; font-size:0.7rem; border-color:#fee2e2; color:#ef4444; background:#fef2f2;">Eliminar</button>` : ''}
+              <input type="file" id="edit-audio-voice-${v.id}" class="edit-voice-audio-input hidden" data-voice="${v.id}" accept="audio/mpeg,audio/mp3">
+              <span class="file-name-text" id="name-edit-audio-voice-${v.id}" style="${hasAudio ? 'color:#10b981; font-weight:600;' : ''}">${audioName}</span>
             </div>
-
-            <!-- Partitura PDF -->
             <div class="file-upload-col">
-              <label class="file-upload-btn ${hasPdf ? 'file-selected' : ''}" for="edit-pdf-voice-${vId}" title="Reemplazar o subir partitura">
+              <label class="file-upload-btn ${hasPdf ? 'file-selected' : ''}" for="edit-pdf-voice-${v.id}" title="Reemplazar partitura de ${v.voice_name}">
                 <span>📄 ${hasPdf ? '✓' : '+'}</span>
               </label>
-              <input type="file" id="edit-pdf-voice-${vId}" class="edit-voice-pdf-input hidden" data-voice="${vId}" accept="application/pdf">
-              <span class="file-name-text" id="name-edit-pdf-voice-${vId}">
-                ${hasPdf ? '<span style="color:#10b981; font-weight:600;">Subido</span>' : 'Sin archivo'}
-              </span>
-              ${hasPdf ? `<button type="button" class="btn btn-ghost btn-sm btn-delete-file" data-hymn="${hymnId}" data-voice="${vId}" data-type="pdf" style="padding:0.1rem 0.3rem; margin-top:0.25rem; font-size:0.7rem; border-color:#fee2e2; color:#ef4444; background:#fef2f2;">Eliminar</button>` : ''}
+              <input type="file" id="edit-pdf-voice-${v.id}" class="edit-voice-pdf-input hidden" data-voice="${v.id}" accept="application/pdf">
+              <span class="file-name-text" id="name-edit-pdf-voice-${v.id}" style="${hasPdf ? 'color:#10b981; font-weight:600;' : ''}">${pdfName}</span>
             </div>
           </div>
         </div>
       `;
-    }).join('');
-
-    setupFileChangeDelegators();
-
-    container.querySelectorAll(".btn-delete-file").forEach(btn => {
-      btn.addEventListener("click", handleDeleteHymnFile);
-    });
+    }).join("");
 
   } catch (err) {
-    container.innerHTML = `<p style="grid-column: 1/-1; text-align:center; color:red; padding:1rem;">Error: ${err.message}</p>`;
+    container.innerHTML = `<p style="grid-column: 1/-1; color:red; text-align:center;">Error: ${err.message}</p>`;
   }
 }
 
-async function handleDeleteHymnFile(e) {
-  const btn = e.currentTarget;
-  const hymnId = btn.getAttribute("data-hymn");
-  const voiceId = parseInt(btn.getAttribute("data-voice"));
-  const fileType = btn.getAttribute("data-type");
-
-  if (!confirm(`¿Estás seguro de eliminar el archivo de ${fileType === 'audio' ? 'audio (MP3)' : 'partitura (PDF)'} de esta voz?`)) return;
-
-  btn.disabled = true;
-  btn.textContent = "Eliminando...";
-
-  try {
-    const { data: link, error: linkError } = await supabase
-      .from("hymn_voice")
-      .select("id, audio_url, pdf_url")
-      .eq("hymn_id", hymnId)
-      .eq("voice_id", voiceId)
-      .single();
-
-    if (linkError) throw linkError;
-
-    const storagePath = fileType === 'audio' ? link.audio_url : link.pdf_url;
-
-    if (storagePath) {
-      const { error: storageError } = await supabase.storage
-        .from("hymns")
-        .remove([storagePath]);
-
-      if (storageError) console.warn("Error eliminando de storage:", storageError.message);
-    }
-
-    const payload = {};
-    if (fileType === 'audio') payload.audio_url = null;
-    else payload.pdf_url = null;
-
-    const { error: updateError } = await supabase
-      .from("hymn_voice")
-      .update(payload)
-      .eq("id", link.id);
-
-    if (updateError) throw updateError;
-
-    const { data: updatedLink } = await supabase
-      .from("hymn_voice")
-      .select("audio_url, pdf_url")
-      .eq("id", link.id)
-      .single();
-
-    if (updatedLink && !updatedLink.audio_url && !updatedLink.pdf_url) {
-      await supabase.from("hymn_voice").delete().eq("id", link.id);
-    }
-
-    const mockEvent = { currentTarget: { getAttribute: (attr) => attr === 'data-id' ? hymnId : null } };
-    await openEditHymnModal(mockEvent);
-    await loadHymns();
-
-  } catch (err) {
-    alert("Error al eliminar archivo: " + err.message);
-    btn.disabled = false;
-    btn.textContent = `Eliminar`;
-  }
+function cerrarEditHymnModal() {
+  document.getElementById("edit-hymn-modal")?.classList.add("hidden");
+  document.getElementById("edit-hymn-form")?.reset();
 }
 
 async function handleUpdateHymn(e) {
   e.preventDefault();
   const hymnId = document.getElementById("edit-hymn-id").value;
-  const title = document.getElementById("edit-hymn-title").value.trim();
-  const key = document.getElementById("edit-hymn-key").value.trim();
-  const version = document.getElementById("edit-hymn-version").value.trim();
-  const access = document.getElementById("edit-hymn-access").value;
-  
+  const titleInput = document.getElementById("edit-hymn-title");
+  const keyInput = document.getElementById("edit-hymn-key");
+  const versionInput = document.getElementById("edit-hymn-version");
+  const accessSelect = document.getElementById("edit-hymn-access");
   const submitBtn = document.getElementById("btn-edit-hymn-submit");
   const statusEl = document.getElementById("edit-hymn-status");
-  const btnText = submitBtn.querySelector(".btn-text");
-  const spinner = submitBtn.querySelector(".spinner");
+  const btnText = submitBtn ? submitBtn.querySelector(".btn-text") : null;
+  const spinner = submitBtn ? submitBtn.querySelector(".spinner") : null;
 
+  const title = titleInput.value.trim();
   if (!title) return;
 
-  submitBtn.disabled = true;
+  if (submitBtn) submitBtn.disabled = true;
   if (btnText) btnText.textContent = "Guardando...";
   if (spinner) spinner.classList.remove("hidden");
-  statusEl.textContent = "Guardando metadatos...";
+  if (statusEl) {
+    statusEl.style.color = "#2563eb";
+    statusEl.textContent = "Actualizando datos del himno...";
+  }
 
   try {
-    const { error: updateError } = await supabase
+    const { error: updateHymnError } = await supabase
       .from("hymns")
       .update({
         title: title,
-        hymn_key: key || null,
-        version_name: version || null,
-        access_level: access
+        hymn_key: keyInput.value.trim() || null,
+        version_name: versionInput.value.trim() || null,
+        access_level: accessSelect.value
       })
       .eq("id", hymnId);
 
-    if (updateError) throw updateError;
+    if (updateHymnError) throw updateHymnError;
 
     const form = e.target;
     const audioInputs = form.querySelectorAll(".edit-voice-audio-input");
@@ -715,7 +674,9 @@ async function handleUpdateHymn(e) {
       let idx = 1;
       for (const upload of uploads) {
         const voiceName = getVoiceNameById(upload.voiceId);
-        statusEl.textContent = `Subiendo archivos (${idx}/${uploads.length}): ${voiceName}...`;
+        if (statusEl) {
+          statusEl.textContent = `Actualizando archivos (${idx}/${uploads.length}): ${voiceName}...`;
+        }
 
         const ext = upload.type === 'audio' ? 'mp3' : 'pdf';
         const folder = upload.type === 'audio' ? 'audios' : 'scores';
@@ -750,7 +711,7 @@ async function handleUpdateHymn(e) {
           if (updateLinkError) throw updateLinkError;
         } else {
           const insertPayload = {
-            hymn_id: parseInt(hymnId),
+            hymn_id: hymnId,
             voice_id: upload.voiceId,
             audio_url: upload.type === 'audio' ? storagePath : null,
             pdf_url: upload.type === 'pdf' ? storagePath : null
@@ -767,36 +728,29 @@ async function handleUpdateHymn(e) {
       }
     }
 
+    showToast(`Himno "${title}" actualizado correctamente.`, "success", "Himno Actualizado");
     cerrarEditHymnModal();
     await loadHymns();
 
   } catch (err) {
-    alert("Error al actualizar himno: " + err.message);
-    statusEl.textContent = "Error al guardar.";
+    console.error("Error al actualizar himno:", err);
+    showToast(`Error al actualizar: ${err.message}`, "error", "Error");
+    if (statusEl) {
+      statusEl.style.color = "#ef4444";
+      statusEl.textContent = `❌ Error: ${err.message || "No se pudo actualizar"}`;
+    }
   } finally {
-    submitBtn.disabled = false;
+    if (submitBtn) submitBtn.disabled = false;
     if (btnText) btnText.textContent = "Guardar Cambios";
     if (spinner) spinner.classList.add("hidden");
   }
 }
 
-function cerrarEditHymnModal() {
-  document.getElementById("edit-hymn-modal").classList.add("hidden");
-  document.getElementById("edit-hymn-form").reset();
-  document.getElementById("edit-hymn-status").textContent = "";
-}
-
-// ---- Helpers ---- //
-
-function getVoiceNameById(id) {
-  const found = cachedVoicesCatalog.find(v => v.id === id);
-  if (found) {
-    return found.voice_name.toLowerCase().replace(/[^a-z0-9]/g, '_');
-  }
-  return `voz_${id}`;
-}
-
-function getVoiceDisplayName(id) {
-  const found = cachedVoicesCatalog.find(v => v.id === id);
-  return found ? found.voice_name : "Desconocida";
+function normalizarTexto(str) {
+  return String(str ?? "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[¿?¡!«»"'\(\)\[\]\.,_\-]/g, "")
+    .trim();
 }

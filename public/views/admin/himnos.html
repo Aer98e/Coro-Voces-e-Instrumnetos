@@ -1,78 +1,106 @@
-<div id="tab-himnos" class="admin-tab-content">
-  <div class="admin-header-flex">
-    <h2 class="section-title" style="margin:0;">Biblioteca de Himnos</h2>
-  </div>
-  <p style="color: #64748b; margin-bottom: 1.5rem;">Registra nuevos himnos en el repertorio, sube archivos de ensayo por voces (MP3) y partituras (PDF).</p>
-
-  <!-- Formulario de creación de himno -->
-  <div class="admin-card" style="margin-bottom: 2rem;">
-    <h3 class="card-title">Agregar Nuevo Himno</h3>
-    <form id="create-hymn-form" class="form-compact" enctype="multipart/form-data">
-      
-      <!-- Metadatos básicos -->
-      <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem;">
-        <div style="flex: 2; min-width: 200px;">
-          <label class="field-label" for="hymn-title">Título del Himno</label>
-          <input type="text" id="hymn-title" class="search-input" placeholder="Ej. Grande es tu fidelidad" required>
-        </div>
-        <div style="flex: 1; min-width: 120px;">
-          <label class="field-label" for="hymn-key">Tono (Clave)</label>
-          <input type="text" id="hymn-key" class="search-input" placeholder="Ej. Sol mayor">
-        </div>
-        <div style="flex: 1; min-width: 150px;">
-          <label class="field-label" for="hymn-version">Versión / Himnario</label>
-          <input type="text" id="hymn-version" class="search-input" placeholder="Ej. Libre o Himnos de Gracia">
-        </div>
-        <div style="flex: 1; min-width: 130px;">
-          <label class="field-label" for="hymn-access">Nivel de Acceso</label>
-          <select id="hymn-access" class="select-input" required>
-            <option value="public" selected>Público (Miembros e Invitados)</option>
-            <option value="private">Privado (Solo Miembros)</option>
-            <option value="hidden">Oculto (Solo Administradores)</option>
-          </select>
-        </div>
+<div id="tab-himnos" class="admin-tab-content fade-in">
+  
+  <!-- VISTA PRINCIPAL: Lista/Tabla de Himnos con Buscador en Tiempo Real -->
+  <div id="himnos-main-view">
+    <div class="admin-header-flex" style="margin-bottom: 1.25rem;">
+      <div>
+        <h2 class="section-title" style="margin:0;">Biblioteca de Himnos</h2>
+        <p style="color: #64748b; margin: 0.25rem 0 0; font-size: 0.9rem;">Gestiona el repertorio completo, archivos de ensayo por voz (MP3) y partituras (PDF).</p>
       </div>
+      <button type="button" id="btn-open-add-hymn-subview" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 0.4rem; font-weight: 600; height: 42px;">
+        ➕ Agregar Nuevo Himno
+      </button>
+    </div>
 
-      <!-- Subida de archivos por voces -->
-      <div style="margin-bottom: 1.5rem;">
-        <h4 style="margin: 0 0 0.75rem; font-size: 0.95rem; color: #475569; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.25rem;">Archivos por Voces e Instrumentos</h4>
+    <!-- Buscador en tiempo real para la tabla -->
+    <div style="margin-bottom: 1.25rem;">
+      <input type="text" id="hymns-search-input" class="search-input" placeholder="🔍 Filtrar himnos por número o título..." autocomplete="off" style="margin: 0; width: 100%;">
+    </div>
+
+    <!-- Tabla de listado de himnos -->
+    <div class="table-container">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Título</th>
+            <th>Tono</th>
+            <th>Versión</th>
+            <th>Acceso</th>
+            <th>Archivos por Voz (Audio/PDF)</th>
+            <th style="text-align: right;">Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="hymns-table-body">
+          <tr><td colspan="7" style="text-align:center;">Cargando biblioteca de himnos...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SUB-VISTA DEDICADA: Agregar Nuevo Himno -->
+  <div id="add-hymn-subview" class="subview-container hidden">
+    <div class="subview-header" style="margin-bottom: 1.25rem;">
+      <button id="btn-back-to-hymns-list" class="btn btn-ghost btn-sm" style="display: inline-flex; align-items: center; gap: 0.4rem; font-weight: 600; margin-bottom: 0.75rem;">
+        ← Volver a Biblioteca de Himnos
+      </button>
+      <div>
+        <h2 class="section-title" style="margin: 0;">Agregar Nuevo Himno</h2>
+        <p style="color: #64748b; margin: 0.25rem 0 0; font-size: 0.9rem;">Registra los metadatos y sube los archivos de voz y partitura correspondientes.</p>
+      </div>
+    </div>
+
+    <!-- Formulario de creación de himno -->
+    <div class="admin-card">
+      <form id="create-hymn-form" class="form-compact" enctype="multipart/form-data">
         
-        <div id="create-voice-files-container" class="voice-files-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
-          <p style="grid-column: 1/-1; text-align:center; color:#64748b;">Cargando catálogo de voces e instrumentos...</p>
+        <!-- Metadatos básicos -->
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem;">
+          <div style="flex: 2; min-width: 200px;">
+            <label class="field-label" for="hymn-title">Título del Himno</label>
+            <input type="text" id="hymn-title" class="search-input" placeholder="Ej. Grande es tu fidelidad" required>
+          </div>
+          <div style="flex: 1; min-width: 120px;">
+            <label class="field-label" for="hymn-key">Tono (Clave)</label>
+            <input type="text" id="hymn-key" class="search-input" placeholder="Ej. Sol mayor">
+          </div>
+          <div style="flex: 1; min-width: 150px;">
+            <label class="field-label" for="hymn-version">Versión / Himnario</label>
+            <input type="text" id="hymn-version" class="search-input" placeholder="Ej. Libre o Himnos de Gracia">
+          </div>
+          <div style="flex: 1; min-width: 130px;">
+            <label class="field-label" for="hymn-access">Nivel de Acceso</label>
+            <select id="hymn-access" class="select-input" required>
+              <option value="public" selected>Público (Miembros e Invitados)</option>
+              <option value="private">Privado (Solo Miembros)</option>
+              <option value="hidden">Oculto (Solo Administradores)</option>
+            </select>
+          </div>
         </div>
-      </div>
 
-      <!-- Subida con Spinner/Progreso -->
-      <div style="display: flex; justify-content: flex-end; align-items: center; gap: 1rem;">
-        <span id="create-hymn-status" style="font-size: 0.85rem; color: #475569;"></span>
-        <button type="submit" id="btn-create-hymn-submit" class="btn btn-primary" style="min-width: 140px; display: flex; align-items: center; justify-content: center; gap: 0.5rem; height: 40px;">
-          <span class="btn-text">Guardar Himno</span>
-          <span class="spinner hidden"></span>
-        </button>
-      </div>
+        <!-- Subida de archivos por voces -->
+        <div style="margin-bottom: 1.5rem;">
+          <h4 style="margin: 0 0 0.75rem; font-size: 0.95rem; color: #475569; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.25rem;">Archivos por Voces e Instrumentos</h4>
+          
+          <div id="create-voice-files-container" class="voice-files-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
+            <p style="grid-column: 1/-1; text-align:center; color:#64748b;">Cargando catálogo de voces e instrumentos...</p>
+          </div>
+        </div>
 
-    </form>
+        <!-- Botones de guardar / cancelar -->
+        <div style="display: flex; justify-content: flex-end; align-items: center; gap: 1rem;">
+          <span id="create-hymn-status" style="font-size: 0.85rem; color: #475569;"></span>
+          <button type="button" id="btn-cancel-create-hymn" class="btn btn-ghost">Cancelar</button>
+          <button type="submit" id="btn-create-hymn-submit" class="btn btn-primary" style="min-width: 140px; display: flex; align-items: center; justify-content: center; gap: 0.5rem; height: 40px;">
+            <span class="btn-text">Guardar Himno</span>
+            <span class="spinner hidden"></span>
+          </button>
+        </div>
+
+      </form>
+    </div>
   </div>
 
-  <!-- Tabla de listado de himnos -->
-  <div class="table-container">
-    <table class="admin-table">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Título</th>
-          <th>Tono</th>
-          <th>Versión</th>
-          <th>Acceso</th>
-          <th>Archivos por Voz (Audio/PDF)</th>
-          <th style="text-align: right;">Acciones</th>
-        </tr>
-      </thead>
-      <tbody id="hymns-table-body">
-        <tr><td colspan="7" style="text-align:center;">Cargando biblioteca de himnos...</td></tr>
-      </tbody>
-    </table>
-  </div>
 </div>
 
 <!-- Modal para editar metadatos y reemplazar archivos de un himno -->
