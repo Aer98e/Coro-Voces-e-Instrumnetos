@@ -1,13 +1,10 @@
 import supabase from "../../config/supabase.js";
+import { showToast } from "../components/toast.js";
 
 let currentUserSession = null;
 let currentRole = null;
-let currentCategoryId = null;
-
-// Estados para vinculación en bloque
-let allHymns = [];
-let initiallyLinkedHymnIds = new Set();
-let currentLinkedHymnIds = new Set();
+let activeCategoryId = null;
+let activeCategoryName = "";
 
 // Cache de grupos
 let allGroups = [];
@@ -66,17 +63,37 @@ export async function initCategoriasAdmin(session, role) {
     createForm.addEventListener("submit", handleCreateCategory);
   }
 
-  // Configurar modal de vincular himnos
-  document.getElementById("btn-link-hymns-close")?.addEventListener("click", cerrarModalVinculacion);
-  document.getElementById("btn-link-hymns-cancel")?.addEventListener("click", cerrarModalVinculacion);
-  document.getElementById("btn-link-hymns-save")?.addEventListener("click", handleSaveLinkedHymns);
-  document.getElementById("btn-select-all-hymns")?.addEventListener("click", selectAllHymns);
-  document.getElementById("btn-deselect-all-hymns")?.addEventListener("click", deselectAllHymns);
+  // Configurar listeners de la sub-vista de vinculación
+  document.getElementById("btn-back-to-categories")?.addEventListener("click", closeLinkHymnsView);
 
-  const searchInput = document.getElementById("search-hymn-input");
+  const searchInput = document.getElementById("linking-search-input");
   if (searchInput) {
-    searchInput.addEventListener("input", handleFilterHymns);
+    searchInput.addEventListener("input", (e) => {
+      if (activeCategoryId) {
+        renderLinkingLists(activeCategoryId, e.target.value.trim());
+      }
+    });
   }
+
+  // Pestañas móviles
+  document.querySelectorAll(".linking-tab-btn").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      document.querySelectorAll(".linking-tab-btn").forEach(b => b.classList.remove("active"));
+      e.currentTarget.classList.add("active");
+      const tab = e.currentTarget.getAttribute("data-tab");
+
+      const colLinked = document.getElementById("col-linked-wrapper");
+      const colAvailable = document.getElementById("col-available-wrapper");
+
+      if (tab === "linked") {
+        colLinked?.classList.add("active-mobile-col");
+        colAvailable?.classList.remove("active-mobile-col");
+      } else {
+        colAvailable?.classList.add("active-mobile-col");
+        colLinked?.classList.remove("active-mobile-col");
+      }
+    });
+  });
 
   // Configurar modal de edición
   document.getElementById("btn-edit-category-close")?.addEventListener("click", cerrarModalEdicion);
@@ -91,24 +108,24 @@ export async function initCategoriasAdmin(session, role) {
 }
 
 async function loadCategories() {
-  const tbody = document.getElementById("categories-table-body");
-  if (!tbody) return;
+  const gridContainer = document.getElementById("categories-grid");
+  if (!gridContainer) return;
 
-  tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Cargando categorías...</td></tr>';
+  gridContainer.innerHTML = '<p class="loading-message">Cargando categorías...</p>';
 
-  // Obtener categorías con el nombre de sus grupos
+  // Obtener categorías ordenadas alfabéticamente
   const { data: categories, error } = await supabase
     .from("categories")
     .select("*, groups(group_name)")
     .order("category_name", { ascending: true });
 
   if (error) {
-    tbody.innerHTML = `<tr><td colspan="5" style="color:red;">Error: ${error.message}</td></tr>`;
+    gridContainer.innerHTML = `<p style="color:red;">Error cargando categorías: ${error.message}</p>`;
     return;
   }
 
   if (!categories || categories.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;">No hay categorías creadas.</td></tr>`;
+    gridContainer.innerHTML = `<p>No hay categorías creadas aún.</p>`;
     return;
   }
 
@@ -138,37 +155,48 @@ async function loadCategories() {
     const count = linkCounts[cat.id] || 0;
     const isGlobal = cat.type === 'global';
     const asignedTo = isGlobal ? 'Global' : (cat.groups?.group_name || 'Desconocido');
-    
-    let actionsHtml = '';
-    if (canManageLinks) {
-      actionsHtml += `<button class="btn-icon btn-link-hymns" data-id="${cat.id}" data-name="${cat.category_name}" title="Vincular Himnos" style="font-size: 1.1rem; margin-right: 0.75rem;">🔗</button>`;
-    }
-    if (canEdit) {
-      actionsHtml += `<button class="btn-icon btn-edit-cat" data-id="${cat.id}" data-name="${cat.category_name}" data-group="${cat.group_id || ''}" title="Editar Categoría" style="font-size: 1.1rem; margin-right: 0.75rem;">✏️</button>`;
-    }
-    if (canDelete) {
-      actionsHtml += `<button class="btn-icon btn-delete-cat" data-id="${cat.id}" title="Eliminar Categoría" style="font-size: 1.1rem;">🗑️</button>`;
-    }
-    if (!canManageLinks && !canEdit && !canDelete) {
-      actionsHtml += `<span style="font-size: 0.8rem; color: #64748b;" title="Solo lectura">🔒 Solo lectura</span>`;
-    }
+
+    const badgeType = isGlobal 
+      ? `<span class="badge badge-global">Global</span>`
+      : `<span class="badge badge-group">Grupo: ${asignedTo}</span>`;
+
+    const actionButtons = `
+      <div class="group-header-actions">
+        ${canEdit ? `<button class="btn-icon btn-edit-cat" data-id="${cat.id}" data-name="${cat.category_name}" data-group="${cat.group_id || ''}" title="Editar Categoría">✏️</button>` : ''}
+        ${canDelete ? `<button class="btn-icon btn-delete-cat" data-id="${cat.id}" title="Eliminar Categoría">🗑️</button>` : ''}
+      </div>
+    `;
 
     html += `
-      <tr>
-        <td style="font-weight: 600;">${cat.category_name}</td>
-        <td><span class="badge ${isGlobal ? 'badge-global' : 'badge-group'}">${isGlobal ? 'Global' : 'Grupo'}</span></td>
-        <td>${asignedTo}</td>
-        <td>${count} himno(s)</td>
-        <td>
-          <div style="display:flex; align-items:center;">
-            ${actionsHtml}
+      <div class="category-card">
+        <div class="group-header">
+          <div class="group-header-info">
+            <h4 class="category-title">${cat.category_name}</h4>
+            <div style="margin-top: 0.35rem;">
+              ${badgeType}
+            </div>
           </div>
-        </td>
-      </tr>
+          ${actionButtons}
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 0.25rem;">
+          <p style="font-size: 0.85rem; color: #64748b; margin: 0; font-weight: 500;">
+            🎵 <strong>${count}</strong> himno(s) vinculados
+          </p>
+
+          ${canManageLinks ? `
+            <button type="button" class="btn btn-secondary btn-sm btn-link-hymns w-full" data-id="${cat.id}" data-name="${cat.category_name}">
+              🔗 Gestionar Himnos (${count})
+            </button>
+          ` : `
+            <p style="font-size: 0.75rem; color: #94a3b8; margin: 0; font-style: italic;">🔒 Solo lectura</p>
+          `}
+        </div>
+      </div>
     `;
   }
 
-  tbody.innerHTML = html || '<tr><td colspan="5" style="text-align:center;">No hay categorías visibles para ti.</td></tr>';
+  gridContainer.innerHTML = html || '<p style="color: #64748b;">No hay categorías visibles para ti.</p>';
 
   // Registrar eventos
   document.querySelectorAll(".btn-delete-cat").forEach(btn => {
@@ -176,13 +204,209 @@ async function loadCategories() {
   });
 
   document.querySelectorAll(".btn-link-hymns").forEach(btn => {
-    btn.addEventListener("click", openLinkHymnsModal);
+    btn.addEventListener("click", (e) => {
+      const id = e.currentTarget.getAttribute("data-id");
+      const name = e.currentTarget.getAttribute("data-name");
+      openLinkHymnsView(id, name);
+    });
   });
 
   document.querySelectorAll(".btn-edit-cat").forEach(btn => {
     btn.addEventListener("click", openEditCategoryModal);
   });
 }
+
+// ---- Sub-vista Dedicada para Vincular Himnos en 2 Columnas ---- //
+
+function openLinkHymnsView(categoryId, categoryName) {
+  activeCategoryId = categoryId;
+  activeCategoryName = categoryName;
+
+  document.getElementById("categories-main-view")?.classList.add("hidden");
+  
+  const subview = document.getElementById("link-hymns-subview");
+  if (subview) subview.classList.remove("hidden");
+
+  const titleEl = document.getElementById("linking-category-title");
+  if (titleEl) titleEl.textContent = `Gestionar Himnos: ${categoryName}`;
+
+  const searchInput = document.getElementById("linking-search-input");
+  if (searchInput) searchInput.value = "";
+
+  // Activar primera columna en móviles
+  const colLinked = document.getElementById("col-linked-wrapper");
+  const colAvailable = document.getElementById("col-available-wrapper");
+  if (colLinked) colLinked.classList.add("active-mobile-col");
+  if (colAvailable) colAvailable.classList.remove("active-mobile-col");
+
+  document.querySelectorAll(".linking-tab-btn").forEach(b => {
+    b.classList.toggle("active", b.getAttribute("data-tab") === "linked");
+  });
+
+  renderLinkingLists(categoryId);
+}
+
+function closeLinkHymnsView() {
+  activeCategoryId = null;
+  activeCategoryName = "";
+
+  document.getElementById("link-hymns-subview")?.classList.add("hidden");
+  document.getElementById("categories-main-view")?.classList.remove("hidden");
+
+  loadCategories();
+}
+
+async function renderLinkingLists(categoryId, query = "") {
+  const linkedListContainer = document.getElementById("linked-hymns-list");
+  const availableListContainer = document.getElementById("available-hymns-list");
+  const badgeLinked = document.getElementById("badge-count-linked");
+  const badgeAvailable = document.getElementById("badge-count-available");
+  const mobileLinkedCount = document.getElementById("mobile-count-linked");
+  const mobileAvailableCount = document.getElementById("mobile-count-available");
+
+  if (linkedListContainer) linkedListContainer.innerHTML = '<p class="loading-message">Cargando vinculados...</p>';
+  if (availableListContainer) availableListContainer.innerHTML = '<p class="loading-message">Cargando disponibles...</p>';
+
+  try {
+    // 1. Obtener todos los himnos disponibles en la plataforma
+    const { data: hymnsData, error: hymnsErr } = await supabase
+      .from("hymns")
+      .select("id, title, access_level");
+
+    if (hymnsErr) throw hymnsErr;
+    const allHymns = hymnsData || [];
+
+    // 2. Obtener IDs de himnos vinculados a esta categoría
+    const { data: linkedData, error: linkedErr } = await supabase
+      .from("hymn_category")
+      .select("hymn_id")
+      .eq("category_id", categoryId);
+
+    if (linkedErr) throw linkedErr;
+
+    const linkedIdsSet = new Set((linkedData || []).map(l => l.hymn_id));
+
+    // Separar en 2 arreglos
+    let linkedHymns = allHymns.filter(h => linkedIdsSet.has(h.id));
+    let availableHymns = allHymns.filter(h => !linkedIdsSet.has(h.id));
+
+    // ORDENAR ALFABÉTICAMENTE por título
+    linkedHymns.sort((a, b) => normalizarTexto(a.title).localeCompare(normalizarTexto(b.title), 'es', { sensitivity: 'base' }));
+    availableHymns.sort((a, b) => normalizarTexto(a.title).localeCompare(normalizarTexto(b.title), 'es', { sensitivity: 'base' }));
+
+    // Filtrar por búsqueda si existe query
+    const normQuery = normalizarTexto(query);
+    if (normQuery !== "") {
+      linkedHymns = linkedHymns.filter(h => normalizarTexto(h.title).includes(normQuery));
+      availableHymns = availableHymns.filter(h => normalizarTexto(h.title).includes(normQuery));
+    }
+
+    // Actualizar contadores
+    if (badgeLinked) badgeLinked.textContent = `${linkedHymns.length} Himnos`;
+    if (badgeAvailable) badgeAvailable.textContent = `${availableHymns.length} Himnos`;
+    if (mobileLinkedCount) mobileLinkedCount.textContent = linkedHymns.length;
+    if (mobileAvailableCount) mobileAvailableCount.textContent = availableHymns.length;
+
+    // Renderizar Columna Vinculados
+    if (linkedListContainer) {
+      if (linkedHymns.length === 0) {
+        linkedListContainer.innerHTML = `<p style="font-size: 0.85rem; color: #64748b; text-align: center; margin: 1.5rem 0;">No hay himnos vinculados ${normQuery ? 'que coincidan' : 'aún'}.</p>`;
+      } else {
+        linkedListContainer.innerHTML = linkedHymns.map(h => {
+          const badgeText = h.access_level === 'private' ? 'Privado' : (h.access_level === 'hidden' ? 'Oculto' : 'Público');
+          const badgeClass = h.access_level === 'private' ? 'badge-voice' : (h.access_level === 'hidden' ? 'badge-group' : 'badge-category');
+          return `
+            <div class="hymn-linking-item">
+              <div class="hymn-linking-info">
+                <span class="hymn-linking-title" title="${h.title}">${h.title}</span>
+                <span class="badge ${badgeClass}" style="font-size: 0.65rem; width: fit-content;">${badgeText}</span>
+              </div>
+              <button type="button" class="btn-action-icon btn-action-remove btn-unlink-hymn" data-id="${h.id}" data-title="${h.title}" title="Desvincular de esta categoría">
+                ✖
+              </button>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    // Renderizar Columna Disponibles
+    if (availableListContainer) {
+      if (availableHymns.length === 0) {
+        availableListContainer.innerHTML = `<p style="font-size: 0.85rem; color: #64748b; text-align: center; margin: 1.5rem 0;">No hay más himnos disponibles ${normQuery ? 'que coincidan' : 'para agregar'}.</p>`;
+      } else {
+        availableListContainer.innerHTML = availableHymns.map(h => {
+          const badgeText = h.access_level === 'private' ? 'Privado' : (h.access_level === 'hidden' ? 'Oculto' : 'Público');
+          const badgeClass = h.access_level === 'private' ? 'badge-voice' : (h.access_level === 'hidden' ? 'badge-group' : 'badge-category');
+          return `
+            <div class="hymn-linking-item">
+              <div class="hymn-linking-info">
+                <span class="hymn-linking-title" title="${h.title}">${h.title}</span>
+                <span class="badge ${badgeClass}" style="font-size: 0.65rem; width: fit-content;">${badgeText}</span>
+              </div>
+              <button type="button" class="btn-action-icon btn-action-add btn-link-hymn" data-id="${h.id}" data-title="${h.title}" title="Agregar a esta categoría">
+                ➕
+              </button>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    // Registrar Eventos de Acción Instantánea
+    document.querySelectorAll(".btn-link-hymn").forEach(btn => {
+      btn.addEventListener("click", async (e) => {
+        const hId = parseInt(e.currentTarget.getAttribute("data-id"));
+        const hTitle = e.currentTarget.getAttribute("data-title");
+        e.currentTarget.disabled = true;
+
+        try {
+          const { error: insErr } = await supabase
+            .from("hymn_category")
+            .insert([{ hymn_id: hId, category_id: parseInt(categoryId) }]);
+
+          if (insErr) throw insErr;
+
+          showToast(`Se vinculó "${hTitle}" a la categoría.`, "success", "Himno Vinculado");
+          await renderLinkingLists(categoryId, query);
+        } catch(err) {
+          showToast("Error al vincular himno: " + err.message, "error", "Error");
+          e.currentTarget.disabled = false;
+        }
+      });
+    });
+
+    document.querySelectorAll(".btn-unlink-hymn").forEach(btn => {
+      btn.addEventListener("click", async (e) => {
+        const hId = parseInt(e.currentTarget.getAttribute("data-id"));
+        const hTitle = e.currentTarget.getAttribute("data-title");
+        e.currentTarget.disabled = true;
+
+        try {
+          const { error: delErr } = await supabase
+            .from("hymn_category")
+            .delete()
+            .eq("category_id", categoryId)
+            .eq("hymn_id", hId);
+
+          if (delErr) throw delErr;
+
+          showToast(`Se desvinculó "${hTitle}" de la categoría.`, "info", "Himno Desvinculado");
+          await renderLinkingLists(categoryId, query);
+        } catch(err) {
+          showToast("Error al desvincular himno: " + err.message, "error", "Error");
+          e.currentTarget.disabled = false;
+        }
+      });
+    });
+
+  } catch (err) {
+    if (linkedListContainer) linkedListContainer.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
+    if (availableListContainer) availableListContainer.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
+  }
+}
+
+// ---- Funciones CRUD de Categoría ---- //
 
 async function handleCreateCategory(e) {
   e.preventDefault();
@@ -213,7 +437,7 @@ async function handleCreateCategory(e) {
     } else if (currentRole === 'special') {
       const groupId = groupSelect.value;
       if (!groupId) {
-        alert("Debes seleccionar un grupo para crear la categoría.");
+        showToast("Debes seleccionar un grupo para crear la categoría.", "warning", "Grupo Requerido");
         btn.disabled = false;
         return;
       }
@@ -224,6 +448,7 @@ async function handleCreateCategory(e) {
     const { error } = await supabase.from('categories').insert([payload]);
     if (error) throw error;
 
+    showToast(`Categoría "${name}" creada exitosamente.`, "success", "Categoría Creada");
     nameInput.value = '';
     if (currentRole === 'special') {
       groupSelect.selectedIndex = 0;
@@ -232,7 +457,7 @@ async function handleCreateCategory(e) {
     }
     await loadCategories();
   } catch (error) {
-    alert("Error al crear categoría: " + error.message);
+    showToast("Error al crear categoría: " + error.message, "error", "Error");
   } finally {
     btn.disabled = false;
   }
@@ -244,7 +469,7 @@ async function handleDeleteCategory(e) {
 
   e.currentTarget.disabled = true;
   try {
-    // 1. Eliminar todos los vínculos de hymn_category primero para evitar error de FK
+    // 1. Eliminar vínculos de hymn_category primero
     await supabase
       .from('hymn_category')
       .delete()
@@ -254,14 +479,13 @@ async function handleDeleteCategory(e) {
     const { error } = await supabase.from('categories').delete().eq('id', catId);
     if (error) throw error;
     
+    showToast("Categoría eliminada correctamente.", "info", "Categoría Eliminada");
     await loadCategories();
   } catch (err) {
-    alert("Error al eliminar la categoría: " + err.message);
+    showToast("Error al eliminar la categoría: " + err.message, "error", "Error");
     e.currentTarget.disabled = false;
   }
 }
-
-// ---- Modal de Edición de Categorías ---- //
 
 function openEditCategoryModal(e) {
   const catId = e.currentTarget.getAttribute("data-id");
@@ -340,218 +564,16 @@ async function handleUpdateCategory(e) {
 
     if (error) throw error;
 
+    showToast(`Categoría actualizada a "${name}".`, "success", "Categoría Actualizada");
     cerrarModalEdicion();
     await loadCategories();
   } catch (err) {
-    alert("Error al actualizar la categoría: " + err.message);
+    showToast("Error al actualizar la categoría: " + err.message, "error", "Error");
   } finally {
     submitBtn.disabled = false;
     if (btnText) btnText.textContent = "Guardar Cambios";
     if (spinner) spinner.classList.add("hidden");
   }
-}
-
-// ---- Modal de Vinculación de Himnos (Selección Múltiple) ---- //
-
-async function openLinkHymnsModal(e) {
-  currentCategoryId = e.currentTarget.getAttribute("data-id");
-  const catName = e.currentTarget.getAttribute("data-name");
-  
-  document.getElementById("link-hymns-subtitle").textContent = `Categoría: ${catName}`;
-  document.getElementById("search-hymn-input").value = "";
-  
-  const checklistContainer = document.getElementById("hymns-checklist-container");
-  const countInfo = document.getElementById("hymns-count-info");
-  
-  checklistContainer.innerHTML = "<p style='padding:1rem; text-align:center; color:#64748b;'>Cargando himnos...</p>";
-  countInfo.textContent = "Cargando...";
-
-  document.getElementById("link-hymns-modal").classList.remove("hidden");
-
-  try {
-    // 1. Fetch all hymns available
-    const { data: hymnsData, error: hymnsError } = await supabase
-      .from("hymns")
-      .select("id, title, access_level")
-      .order("title");
-
-    if (hymnsError) throw hymnsError;
-    allHymns = hymnsData || [];
-
-    // 2. Fetch linked hymns for this category
-    const { data: linkedData, error: linkedError } = await supabase
-      .from("hymn_category")
-      .select("hymn_id")
-      .eq("category_id", currentCategoryId);
-
-    if (linkedError) throw linkedError;
-
-    initiallyLinkedHymnIds = new Set(linkedData ? linkedData.map(l => l.hymn_id) : []);
-    currentLinkedHymnIds = new Set(initiallyLinkedHymnIds);
-
-    // 3. Render
-    renderHymnsChecklist();
-    updateHymnsCountInfo();
-
-  } catch (err) {
-    checklistContainer.innerHTML = `<p style="color:red; padding:1rem;">Error: ${err.message}</p>`;
-    countInfo.textContent = "Error al cargar.";
-  }
-}
-
-function renderHymnsChecklist() {
-  const container = document.getElementById("hymns-checklist-container");
-  if (!container) return;
-
-  if (allHymns.length === 0) {
-    container.innerHTML = "<p style='padding:1rem; text-align:center; color:#64748b;'>No hay himnos registrados en el sistema.</p>";
-    return;
-  }
-
-  container.innerHTML = allHymns.map(h => {
-    const isChecked = currentLinkedHymnIds.has(h.id);
-    const badgeText = h.access_level === 'private' ? 'Privado' : (h.access_level === 'hidden' ? 'Oculto' : 'Público');
-    const badgeClass = h.access_level === 'private' ? 'badge-voice' : (h.access_level === 'hidden' ? 'badge-group' : 'badge-category');
-    const normalizedTitle = normalizarTexto(h.title);
-
-    return `
-      <label class="hymn-checkbox-item" data-id="${h.id}" data-normalized="${normalizedTitle}">
-        <input type="checkbox" class="hymn-checkbox-input" data-id="${h.id}" ${isChecked ? 'checked' : ''}>
-        <span class="hymn-checkbox-label">${h.title}</span>
-        <span class="badge ${badgeClass} hymn-checkbox-badge">${badgeText}</span>
-      </label>
-    `;
-  }).join('');
-
-  // Eventos de check
-  container.querySelectorAll(".hymn-checkbox-input").forEach(cb => {
-    cb.addEventListener("change", (e) => {
-      const id = parseInt(e.target.getAttribute("data-id"));
-      if (e.target.checked) {
-        currentLinkedHymnIds.add(id);
-      } else {
-        currentLinkedHymnIds.delete(id);
-      }
-      updateHymnsCountInfo();
-    });
-  });
-}
-
-function updateHymnsCountInfo() {
-  const info = document.getElementById("hymns-count-info");
-  if (info) {
-    info.textContent = `${currentLinkedHymnIds.size} de ${allHymns.length} himnos vinculados`;
-  }
-}
-
-function selectAllHymns() {
-  const visibleItems = document.querySelectorAll(".hymn-checkbox-item:not(.hidden)");
-  visibleItems.forEach(item => {
-    const cb = item.querySelector(".hymn-checkbox-input");
-    if (cb && !cb.checked) {
-      cb.checked = true;
-      const id = parseInt(cb.getAttribute("data-id"));
-      currentLinkedHymnIds.add(id);
-    }
-  });
-  updateHymnsCountInfo();
-}
-
-function deselectAllHymns() {
-  const visibleItems = document.querySelectorAll(".hymn-checkbox-item:not(.hidden)");
-  visibleItems.forEach(item => {
-    const cb = item.querySelector(".hymn-checkbox-input");
-    if (cb && cb.checked) {
-      cb.checked = false;
-      const id = parseInt(cb.getAttribute("data-id"));
-      currentLinkedHymnIds.delete(id);
-    }
-  });
-  updateHymnsCountInfo();
-}
-
-function handleFilterHymns(e) {
-  const query = normalizarTexto(e.target.value);
-  const items = document.querySelectorAll(".hymn-checkbox-item");
-  let matchCount = 0;
-  
-  items.forEach(item => {
-    const normalizedTitle = item.getAttribute("data-normalized");
-    if (query === "" || normalizedTitle.includes(query)) {
-      item.classList.remove("hidden");
-      item.style.display = "flex";
-      matchCount++;
-    } else {
-      item.classList.add("hidden");
-      item.style.display = "none";
-    }
-  });
-
-  const info = document.getElementById("hymns-count-info");
-  if (info) {
-    if (query !== "") {
-      info.textContent = `${matchCount} coincidentes (${currentLinkedHymnIds.size} marcados en total)`;
-    } else {
-      updateHymnsCountInfo();
-    }
-  }
-}
-
-async function handleSaveLinkedHymns() {
-  const submitBtn = document.getElementById("btn-link-hymns-save");
-  const btnText = submitBtn.querySelector(".btn-text");
-  const spinner = submitBtn.querySelector(".spinner");
-
-  submitBtn.disabled = true;
-  if (btnText) btnText.textContent = "Guardando...";
-  if (spinner) spinner.classList.remove("hidden");
-
-  const added = [...currentLinkedHymnIds].filter(id => !initiallyLinkedHymnIds.has(id));
-  const removed = [...initiallyLinkedHymnIds].filter(id => !currentLinkedHymnIds.has(id));
-
-  try {
-    // 1. Eliminar removidos
-    if (removed.length > 0) {
-      const { error: deleteError } = await supabase
-        .from("hymn_category")
-        .delete()
-        .eq("category_id", currentCategoryId)
-        .in("hymn_id", removed);
-      
-      if (deleteError) throw deleteError;
-    }
-
-    // 2. Insertar agregados
-    if (added.length > 0) {
-      const inserts = added.map(hymnId => ({
-        hymn_id: hymnId,
-        category_id: parseInt(currentCategoryId)
-      }));
-
-      const { error: insertError } = await supabase
-        .from("hymn_category")
-        .insert(inserts);
-
-      if (insertError) throw insertError;
-    }
-
-    cerrarModalVinculacion();
-    await loadCategories();
-  } catch (err) {
-    alert("Error al guardar vínculos: " + err.message);
-  } finally {
-    submitBtn.disabled = false;
-    if (btnText) btnText.textContent = "Guardar Cambios";
-    if (spinner) spinner.classList.add("hidden");
-  }
-}
-
-function cerrarModalVinculacion() {
-  document.getElementById("link-hymns-modal").classList.add("hidden");
-  allHymns = [];
-  initiallyLinkedHymnIds = new Set();
-  currentLinkedHymnIds = new Set();
-  currentCategoryId = null;
 }
 
 // ---- Helpers ---- //
@@ -560,7 +582,7 @@ function normalizarTexto(str) {
   return String(str ?? "")
     .toLowerCase()
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "") // Remueve tildes
-    .replace(/[¿?¡!«»"'\(\)\[\]\.,_\-]/g, "") // Remueve signos de puntuación y comas
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[¿?¡!«»"'\(\)\[\]\.,_\-]/g, "")
     .trim();
 }
