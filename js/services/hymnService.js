@@ -203,9 +203,81 @@ export async function cargarVoces() {
   }
 }
 
+/**
+ * Asigna un permiso individual a un usuario para un himno específico (Nivel 2)
+ * @param {number} hymnId - ID del himno
+ * @param {string} userId - UUID del usuario
+ * @returns {Promise<Object>} Datos del permiso asignado
+ */
+export async function asignarPermisoUsuario(hymnId, userId) {
+  try {
+    const { data: sessionData } = await supabase.auth.getSession();
+    const currentUserId = sessionData?.session?.user?.id || null;
+
+    const { data, error } = await supabase
+      .from("hymn_user_permissions")
+      .upsert({
+        hymn_id: hymnId,
+        user_id: userId,
+        granted_by: currentUserId
+      }, { onConflict: "hymn_id,user_id" })
+      .select();
+
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error("Error asignando permiso individual:", error);
+    throw error;
+  }
+}
+
+/**
+ * Revoca un permiso individual de un usuario para un himno
+ * @param {number} hymnId - ID del himno
+ * @param {string} userId - UUID del usuario
+ */
+export async function removerPermisoUsuario(hymnId, userId) {
+  try {
+    const { error } = await supabase
+      .from("hymn_user_permissions")
+      .delete()
+      .eq("hymn_id", hymnId)
+      .eq("user_id", userId);
+
+    if (error) throw error;
+  } catch (error) {
+    console.error("Error removiendo permiso individual:", error);
+    throw error;
+  }
+}
+
+/**
+ * Obtiene los permisos individuales asignados a un himno específico
+ * @param {number} hymnId - ID del himno
+ * @returns {Promise<Array>} Lista de permisos con datos del perfil del usuario
+ */
+export async function obtenerPermisosHimno(hymnId) {
+  try {
+    const { data, error } = await supabase
+      .from("hymn_user_permissions")
+      .select("*, profiles:user_id(id, name, email)")
+      .eq("hymn_id", hymnId);
+
+    if (error) throw error;
+    return data || [];
+  } catch (error) {
+    console.error("Error obteniendo permisos del himno:", error);
+    throw error;
+  }
+}
+
 export default {
   cargarHimnos,
   cargarCategoriasUnicas,
   generarURLFirmada,
-  cargarVoces
+  cargarVoces,
+  asignarPermisoUsuario,
+  removerPermisoUsuario,
+  obtenerPermisosHimno
 };
+
