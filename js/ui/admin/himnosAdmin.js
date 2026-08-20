@@ -120,12 +120,16 @@ export async function initHimnosAdmin(session, role) {
   document.getElementById("btn-back-to-hymns-list")?.addEventListener("click", closeAddHymnSubView);
   document.getElementById("btn-cancel-create-hymn")?.addEventListener("click", closeAddHymnSubView);
 
-  // Buscador en tiempo real de la tabla de himnos
+  // Buscador y Filtro por Nivel de Acceso de la tabla de himnos
   const searchInput = document.getElementById("hymns-search-input");
+  const accessFilterSelect = document.getElementById("hymns-filter-access");
+
   if (searchInput) {
-    searchInput.addEventListener("input", (e) => {
-      filterAndRenderHymnsTable(e.target.value);
-    });
+    searchInput.addEventListener("input", () => filterAndRenderHymnsTable());
+  }
+
+  if (accessFilterSelect) {
+    accessFilterSelect.addEventListener("change", () => filterAndRenderHymnsTable());
   }
 
   // Configurar listeners de creación
@@ -283,15 +287,37 @@ async function loadHymns() {
   }
 }
 
-function filterAndRenderHymnsTable(query = '') {
+function filterAndRenderHymnsTable() {
   const tbody = document.getElementById("hymns-table-body");
   if (!tbody) return;
+
+  const searchInput = document.getElementById("hymns-search-input");
+  const accessFilterSelect = document.getElementById("hymns-filter-access");
+
+  const query = searchInput ? searchInput.value : '';
+  const accessFilter = accessFilterSelect ? accessFilterSelect.value : 'all';
 
   const normQuery = normalizarTexto(query);
   let filtered = allHymnsCache;
 
+  // 1. Filtrar por Nivel de Acceso
+  if (accessFilter !== 'all') {
+    filtered = filtered.filter(h => {
+      const level = h.access_level || 'public';
+      if (accessFilter === 'public') {
+        return level === 'public';
+      } else if (accessFilter === 'individual') {
+        return level === 'individual' || level === 'private';
+      } else if (accessFilter === 'restricted') {
+        return level === 'restricted' || level === 'hidden';
+      }
+      return level === accessFilter;
+    });
+  }
+
+  // 2. Filtrar por texto de búsqueda (título, id, tono, versión)
   if (normQuery !== '') {
-    filtered = allHymnsCache.filter(h => {
+    filtered = filtered.filter(h => {
       const title = normalizarTexto(h.title);
       const id = String(h.id || '');
       const key = normalizarTexto(h.hymn_key);
@@ -301,7 +327,7 @@ function filterAndRenderHymnsTable(query = '') {
   }
 
   if (filtered.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#64748b; padding:1.5rem 0;">No se encontraron himnos ${normQuery ? 'que coincidan' : 'registrados'}.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#64748b; padding:1.5rem 0;">No se encontraron himnos que coincidan con los filtros aplicados.</td></tr>`;
     return;
   }
 

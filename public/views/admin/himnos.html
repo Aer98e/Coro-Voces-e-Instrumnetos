@@ -12,9 +12,19 @@
       </button>
     </div>
 
-    <!-- Buscador en tiempo real para la tabla -->
-    <div style="margin-bottom: 1.25rem;">
-      <input type="text" id="hymns-search-input" class="search-input" placeholder="🔍 Filtrar himnos por número o título..." autocomplete="off" style="margin: 0; width: 100%;">
+    <!-- Buscador y Filtro por Nivel de Acceso -->
+    <div style="display: flex; gap: 1rem; margin-bottom: 1.25rem; flex-wrap: wrap;">
+      <div style="flex: 1; min-width: 240px;">
+        <input type="text" id="hymns-search-input" class="search-input" placeholder="🔍 Filtrar himnos por número o título..." autocomplete="off" style="margin: 0; width: 100%;">
+      </div>
+      <div style="width: 220px; min-width: 180px;">
+        <select id="hymns-filter-access" class="select-input" style="margin: 0; width: 100%; height: 42px;">
+          <option value="all" selected>🌐 Todos los accesos</option>
+          <option value="public">Público</option>
+          <option value="individual">Individual / Privado</option>
+          <option value="restricted">Por Grupo / Oculto</option>
+        </select>
+      </div>
     </div>
 
     <!-- Tabla de listado de himnos -->
