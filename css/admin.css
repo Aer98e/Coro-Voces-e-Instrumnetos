@@ -109,13 +109,22 @@
   font-size: 0.9rem;
 }
 
+#tab-himnos .admin-table {
+  min-width: 950px;
+}
+
+#tab-himnos .admin-table th:last-child,
+#tab-himnos .admin-table td:last-child {
+  width: 140px;
+  min-width: 140px;
+  text-align: right;
+  white-space: nowrap;
+  padding-right: 1rem;
+}
+
 @media (max-width: 768px) {
   .admin-table {
     min-width: 650px; /* Ancho mínimo razonable para evitar compresión en móviles */
-  }
-  
-  #tab-himnos .admin-table {
-    min-width: 850px; /* Ancho mayor para las columnas de himnos */
   }
 }
 

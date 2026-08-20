@@ -356,9 +356,11 @@ async function renderLinkingLists(categoryId, query = "") {
     // Registrar Eventos de Acción Instantánea
     document.querySelectorAll(".btn-link-hymn").forEach(btn => {
       btn.addEventListener("click", async (e) => {
-        const hId = parseInt(e.currentTarget.getAttribute("data-id"));
-        const hTitle = e.currentTarget.getAttribute("data-title");
-        e.currentTarget.disabled = true;
+        const buttonEl = e.currentTarget;
+        if (!buttonEl) return;
+        const hId = parseInt(buttonEl.getAttribute("data-id"));
+        const hTitle = buttonEl.getAttribute("data-title");
+        buttonEl.disabled = true;
 
         try {
           const { error: insErr } = await supabase
@@ -370,17 +372,28 @@ async function renderLinkingLists(categoryId, query = "") {
           showToast(`Se vinculó "${hTitle}" a la categoría.`, "success", "Himno Vinculado");
           await renderLinkingLists(categoryId, query);
         } catch(err) {
-          showToast("Error al vincular himno: " + err.message, "error", "Error");
-          e.currentTarget.disabled = false;
+          const isRlsError = err.code === "42501" || (err.message && (err.message.toLowerCase().includes("row-level security") || err.message.toLowerCase().includes("policy")));
+          if (isRlsError) {
+            showToast(
+              `Este himno es privado. Para vincularlo a tu grupo, un administrador debe otorgarte permiso explícito.`,
+              "warning",
+              "Acceso Restringido 🔒"
+            );
+          } else {
+            showToast(`No se pudo vincular "${hTitle}": ${err.message || "Error de permisos"}`, "error", "Error");
+          }
+          if (buttonEl) buttonEl.disabled = false;
         }
       });
     });
 
     document.querySelectorAll(".btn-unlink-hymn").forEach(btn => {
       btn.addEventListener("click", async (e) => {
-        const hId = parseInt(e.currentTarget.getAttribute("data-id"));
-        const hTitle = e.currentTarget.getAttribute("data-title");
-        e.currentTarget.disabled = true;
+        const buttonEl = e.currentTarget;
+        if (!buttonEl) return;
+        const hId = parseInt(buttonEl.getAttribute("data-id"));
+        const hTitle = buttonEl.getAttribute("data-title");
+        buttonEl.disabled = true;
 
         try {
           const { error: delErr } = await supabase
@@ -394,8 +407,17 @@ async function renderLinkingLists(categoryId, query = "") {
           showToast(`Se desvinculó "${hTitle}" de la categoría.`, "info", "Himno Desvinculado");
           await renderLinkingLists(categoryId, query);
         } catch(err) {
-          showToast("Error al desvincular himno: " + err.message, "error", "Error");
-          e.currentTarget.disabled = false;
+          const isRlsError = err.code === "42501" || (err.message && (err.message.toLowerCase().includes("row-level security") || err.message.toLowerCase().includes("policy")));
+          if (isRlsError) {
+            showToast(
+              `No puedes desvincular este himno privado. Solo un administrador tienen permiso para hacerlo.`,
+              "warning",
+              "Acceso Restringido 🔒"
+            );
+          } else {
+            showToast(`No se pudo desvincular "${hTitle}": ${err.message || "Error de permisos"}`, "error", "Error");
+          }
+          if (buttonEl) buttonEl.disabled = false;
         }
       });
     });

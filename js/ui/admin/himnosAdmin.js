@@ -1,5 +1,5 @@
 import supabase from "../../config/supabase.js";
-import { cargarVoces } from "../../services/hymnService.js";
+import { cargarVoces, asignarPermisoUsuario, removerPermisoUsuario, obtenerPermisosHimno } from "../../services/hymnService.js";
 import { showToast } from "../components/toast.js";
 
 let currentUserSession = null;
@@ -159,6 +159,13 @@ export async function initHimnosAdmin(session, role) {
     newEditForm.addEventListener("submit", handleUpdateHymn);
     document.getElementById("btn-edit-hymn-cancel")?.addEventListener("click", cerrarEditHymnModal);
   }
+
+  // Configurar listeners del modal de permisos individuales
+  document.getElementById("btn-permissions-hymn-close")?.addEventListener("click", closePermissionsModal);
+  document.getElementById("btn-permissions-hymn-done")?.addEventListener("click", closePermissionsModal);
+  document.getElementById("permissions-user-search")?.addEventListener("input", (e) => {
+    renderPermissionsUsersTable(e.target.value);
+  });
 
   setupFileChangeDelegators();
   await loadHymns();
@@ -321,9 +328,11 @@ function filterAndRenderHymnsTable(query = '') {
 
     const accessBadge = h.access_level === 'public'
       ? `<span class="badge badge-global" style="color:initial;">Público</span>`
-      : (h.access_level === 'private'
-        ? `<span class="badge badge-voice" style="color:initial;">Privado</span>`
-        : `<span class="badge badge-voice-p" style="color:initial;">Oculto</span>`);
+      : (h.access_level === 'individual'
+        ? `<span class="badge badge-voice" style="color:initial;">Individual</span>`
+        : (h.access_level === 'restricted'
+          ? `<span class="badge badge-category" style="color:initial;">Grupo</span>`
+          : `<span class="badge badge-voice-p" style="color:initial;">${h.access_level || 'Privado'}</span>`));
 
     return `
       <tr>
@@ -332,16 +341,21 @@ function filterAndRenderHymnsTable(query = '') {
         <td>${h.hymn_key || '-'}</td>
         <td>${h.version_name || '-'}</td>
         <td>${accessBadge}</td>
-        <td><div style="display: flex; flex-wrap: wrap; gap: 0.25rem; align-items: center; max-width: 240px;">${voiceBadges}</div></td>
-        <td style="text-align: right;">
-          <div style="display:flex; justify-content: flex-end; align-items:center;">
-            <button class="btn-icon btn-edit-hymn" data-id="${h.id}" title="Editar Himno" style="font-size: 1.15rem; margin-right: 0.75rem;">✏️</button>
-            <button class="btn-icon btn-delete-hymn" data-id="${h.id}" title="Eliminar Himno" style="font-size: 1.15rem;">🗑️</button>
+        <td><div style="display: flex; flex-wrap: wrap; gap: 0.25rem; align-items: center; min-width: 220px;">${voiceBadges}</div></td>
+        <td style="text-align: right; white-space: nowrap;">
+          <div style="display:flex; justify-content: flex-end; align-items:center; gap: 0.4rem; white-space: nowrap;">
+            <button class="btn-icon btn-permissions-hymn" data-id="${h.id}" title="Permisos Individuales" style="font-size: 1.1rem; padding: 0.2rem;">🔑</button>
+            <button class="btn-icon btn-edit-hymn" data-id="${h.id}" title="Editar Himno" style="font-size: 1.1rem; padding: 0.2rem;">✏️</button>
+            <button class="btn-icon btn-delete-hymn" data-id="${h.id}" title="Eliminar Himno" style="font-size: 1.1rem; padding: 0.2rem;">🗑️</button>
           </div>
         </td>
       </tr>
     `;
   }).join('');
+
+  tbody.querySelectorAll(".btn-permissions-hymn").forEach(btn => {
+    btn.addEventListener("click", openPermissionsModal);
+  });
 
   tbody.querySelectorAll(".btn-edit-hymn").forEach(btn => {
     btn.addEventListener("click", openEditHymnModal);
@@ -349,6 +363,108 @@ function filterAndRenderHymnsTable(query = '') {
 
   tbody.querySelectorAll(".btn-delete-hymn").forEach(btn => {
     btn.addEventListener("click", handleDeleteHymn);
+  });
+}
+
+let currentPermissionsHymnId = null;
+let cachedUsersForPermissions = [];
+let cachedCurrentPermissions = [];
+
+async function openPermissionsModal(e) {
+  const hymnId = parseInt(e.currentTarget.getAttribute("data-id"));
+  currentPermissionsHymnId = hymnId;
+
+  const modal = document.getElementById("permissions-hymn-modal");
+  if (!modal) return;
+
+  const hymn = allHymnsCache.find(h => h.id === hymnId);
+  const subtitle = document.getElementById("permissions-hymn-subtitle");
+  if (subtitle && hymn) {
+    subtitle.textContent = `Gestión de permisos individuales para: "${hymn.title}" (ID: ${hymn.id})`;
+  }
+
+  modal.classList.remove("hidden");
+
+  try {
+    const [usersRes, permRes] = await Promise.all([
+      supabase.from("profiles").select("id, email, name, role").order("email"),
+      obtenerPermisosHimno(hymnId)
+    ]);
+
+    cachedUsersForPermissions = usersRes.data || [];
+    cachedCurrentPermissions = permRes || [];
+
+    renderPermissionsUsersTable("");
+  } catch (err) {
+    console.error("Error cargando datos de permisos:", err);
+    showToast("Error cargando lista de usuarios o permisos", "error", "Error");
+  }
+}
+
+function closePermissionsModal() {
+  const modal = document.getElementById("permissions-hymn-modal");
+  if (modal) modal.classList.add("hidden");
+  currentPermissionsHymnId = null;
+}
+
+function renderPermissionsUsersTable(filterTerm = "") {
+  const tbody = document.getElementById("permissions-user-tbody");
+  if (!tbody) return;
+
+  const term = filterTerm.toLowerCase().trim();
+  const list = cachedUsersForPermissions.filter(u => 
+    !term || (u.email && u.email.toLowerCase().includes(term)) || (u.name && u.name.toLowerCase().includes(term))
+  );
+
+  if (list.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="3" style="text-align:center;">No se encontraron usuarios.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = list.map(user => {
+    const perm = cachedCurrentPermissions.find(p => p.user_id === user.id);
+    const hasAccess = !!perm;
+
+    return `
+      <tr>
+        <td style="font-weight: 500;">
+          ${user.email || 'Sin correo'}
+          <span style="display:block; font-size: 0.75rem; color:#64748b;">${user.name || ''} (${user.role})</span>
+        </td>
+        <td style="text-align: center;">
+          <span class="badge ${hasAccess ? 'badge-global' : 'badge-voice-p'}" style="color:initial;">
+            ${hasAccess ? 'Concedido (Nivel 2)' : 'Sin Asignación'}
+          </span>
+        </td>
+        <td style="text-align: right;">
+          <button class="btn btn-sm ${hasAccess ? 'btn-ghost' : 'btn-primary'} btn-toggle-perm" data-user="${user.id}" style="padding: 0.25rem 0.6rem; font-size: 0.8rem;">
+            ${hasAccess ? 'Revocar ❌' : 'Conceder ✅'}
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+
+  tbody.querySelectorAll(".btn-toggle-perm").forEach(btn => {
+    btn.addEventListener("click", async (ev) => {
+      const userId = ev.currentTarget.getAttribute("data-user");
+      const perm = cachedCurrentPermissions.find(p => p.user_id === userId);
+
+      ev.currentTarget.disabled = true;
+      try {
+        if (perm) {
+          await removerPermisoUsuario(currentPermissionsHymnId, userId);
+          showToast("Permiso individual revocado.", "success", "Permisos");
+        } else {
+          await asignarPermisoUsuario(currentPermissionsHymnId, userId);
+          showToast("Permiso individual concedido.", "success", "Permisos");
+        }
+        cachedCurrentPermissions = await obtenerPermisosHimno(currentPermissionsHymnId);
+        renderPermissionsUsersTable(filterTerm);
+      } catch (err) {
+        showToast(`Error actualizando permiso: ${err.message}`, "error", "Error");
+      }
+    });
   });
 }
 
@@ -385,6 +501,9 @@ async function handleCreateHymn(e) {
   }
 
   try {
+    const { data: sessionData } = await supabase.auth.getSession();
+    const currentUserId = sessionData?.session?.user?.id || null;
+
     const { data: hymn, error: insertError } = await supabase
       .from("hymns")
       .insert([{
@@ -392,6 +511,7 @@ async function handleCreateHymn(e) {
         hymn_key: keyInput.value.trim() || null,
         version_name: versionInput.value.trim() || null,
         access_level: accessSelect.value,
+        created_by: currentUserId,
         register: new Date().toISOString().split('T')[0]
       }])
       .select()
