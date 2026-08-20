@@ -12,9 +12,19 @@
       </button>
     </div>
 
-    <!-- Buscador en tiempo real para la tabla -->
-    <div style="margin-bottom: 1.25rem;">
-      <input type="text" id="hymns-search-input" class="search-input" placeholder="🔍 Filtrar himnos por número o título..." autocomplete="off" style="margin: 0; width: 100%;">
+    <!-- Buscador y Filtro por Nivel de Acceso -->
+    <div style="display: flex; gap: 1rem; margin-bottom: 1.25rem; flex-wrap: wrap;">
+      <div style="flex: 1; min-width: 240px;">
+        <input type="text" id="hymns-search-input" class="search-input" placeholder="🔍 Filtrar himnos por número o título..." autocomplete="off" style="margin: 0; width: 100%;">
+      </div>
+      <div style="width: 220px; min-width: 180px;">
+        <select id="hymns-filter-access" class="select-input" style="margin: 0; width: 100%; height: 42px;">
+          <option value="all" selected>🌐 Todos los accesos</option>
+          <option value="public">Público</option>
+          <option value="individual">Individual / Privado</option>
+          <option value="restricted">Por Grupo / Oculto</option>
+        </select>
+      </div>
     </div>
 
     <!-- Tabla de listado de himnos -->
@@ -71,9 +81,9 @@
           <div style="flex: 1; min-width: 130px;">
             <label class="field-label" for="hymn-access">Nivel de Acceso</label>
             <select id="hymn-access" class="select-input" required>
-              <option value="public" selected>Público (Miembros e Invitados)</option>
-              <option value="private">Privado (Solo Miembros)</option>
-              <option value="hidden">Oculto (Solo Administradores)</option>
+              <option value="public" selected>Acceso Público (Cualquier persona)</option>
+              <option value="individual">Acceso Individual (Por usuario específico)</option>
+              <option value="restricted">Acceso por Grupo (Por categoría de grupo)</option>
             </select>
           </div>
         </div>
@@ -130,9 +140,9 @@
         <div style="flex: 1; min-width: 130px;">
           <label class="field-label" for="edit-hymn-access">Acceso</label>
           <select id="edit-hymn-access" class="select-input" required>
-            <option value="public">Público</option>
-            <option value="private">Privado</option>
-            <option value="hidden">Oculto</option>
+            <option value="public">Acceso Público</option>
+            <option value="individual">Acceso Individual</option>
+            <option value="restricted">Acceso por Grupo</option>
           </select>
         </div>
       </div>
@@ -162,3 +172,38 @@
     </form>
   </div>
 </div>
+
+<!-- Modal para gestionar permisos individuales por usuario e himno -->
+<div id="permissions-hymn-modal" class="modal-overlay hidden">
+  <div class="login-card" style="max-width: 650px; width: 95%; padding: 2rem;">
+    <button id="btn-permissions-hymn-close" class="modal-close-btn">&times;</button>
+    <h2 class="modal-title-login" style="margin-bottom: 0.25rem;">Permisos Individuales de Usuario</h2>
+    <p id="permissions-hymn-subtitle" class="modal-subtitle-login" style="margin-bottom: 1.25rem;">Asigna permisos explícitos a usuarios para este himno</p>
+    
+    <input type="hidden" id="permissions-hymn-id">
+
+    <div style="margin-bottom: 1rem;">
+      <input type="text" id="permissions-user-search" class="search-input" placeholder="🔍 Buscar usuario por correo..." style="margin: 0; width: 100%;">
+    </div>
+
+    <div style="max-height: 280px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 0.5rem; margin-bottom: 1.5rem;">
+      <table class="admin-table" style="margin:0;">
+        <thead>
+          <tr>
+            <th>Usuario</th>
+            <th style="text-align: center;">Nivel 2 (Acceso Individual)</th>
+            <th style="text-align: right;">Acción</th>
+          </tr>
+        </thead>
+        <tbody id="permissions-user-tbody">
+          <tr><td colspan="3" style="text-align:center;">Cargando usuarios y permisos...</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="display: flex; justify-content: flex-end;">
+      <button type="button" id="btn-permissions-hymn-done" class="btn btn-primary">Listo</button>
+    </div>
+  </div>
+</div>
+
