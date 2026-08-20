@@ -21,7 +21,8 @@ Registros de los himnos del repertorio.
 * **hymn_key**: `text` (Permite nulos)
 * **register**: `date` (Permite nulos)
 * **version_name**: `text` (Permite nulos)
-* **access_level**: `text` (Permite nulos, ej: `'public'`, `'private'`, o `'hidden'`)
+* **access_level**: `text` (Permite nulos, ej: `'public'`, `'individual'`, `'restricted'`)
+* **created_by**: `uuid` (Permite nulos, Llave Foránea a `profiles(id)`, usuario creador/propietario del himno)
 
 ### `voices`
 Voces de coro disponibles en la aplicación.
@@ -62,26 +63,36 @@ Miembros que pertenecen a cada grupo.
 * **added_by**: `uuid` (No nulo, Llave Foránea a `profiles`)
 * **added_at**: `timestamp with time zone` (Valor por defecto: `now()`)
 
+### `hymn_user_permissions`
+Tabla mediadora para permisos individuales asignados explícitamente a un usuario específico por himno (Nivel 2). Poseer un registro en esta tabla otorga automáticamente acceso de lectura y derecho a asociar/compartir el himno con los propios grupos.
+* **id**: `bigint` (No nulo, Llave Primaria, autoincrementable)
+* **hymn_id**: `integer` (No nulo, Llave Foránea a `hymns`)
+* **user_id**: `uuid` (No nulo, Llave Foránea a `profiles`)
+* **granted_by**: `uuid` (Permite nulos, Llave Foránea a `profiles`)
+* **created_at**: `timestamp with time zone` (Valor por defecto: `now()`)
+
 ---
 
 ## 🔐 Políticas de Seguridad de Fila (RLS)
 
 Todas las tablas y buckets tienen habilitado RLS para garantizar la integridad y privacidad de los datos musicales.
 
+El sistema funciona con **tres niveles de acceso de lectura**:
+1. **Acceso Público**: `hymns.access_level = 'public'` (disponible para todo público, incluso no autenticados).
+2. **Acceso Individual (Por Usuario)**: Asignación explícita mediante la tabla `hymn_user_permissions`.
+3. **Acceso por Categoría (Por Grupo)**: Heredado colectivamente mediante pertenencia a un grupo (`group_members`) cuya categoría está vinculada al himno (`hymn_category`).
+
 ### 1. `voices`
 * **Lectura**: Cualquiera puede leer las voces (`SELECT` permitido para todo público).
 * **Escritura**: Solo administradores (`public.get_current_user_role() = 'admin'`) pueden insertar o actualizar voces.
 
 ### 2. `hymn_voice`
-* **Lectura**: Cualquiera puede ver las relaciones (`SELECT` permitido para todo público).
+* **Lectura**: Cualquiera puede leer la relación himno-voz (`SELECT` libre).
 * **Escritura**: Solo administradores pueden insertar o actualizar estas relaciones.
 
 ### 3. `hymns`
-* **Lectura (SELECT)**:
-  * Nivel de acceso `public` es visible por cualquier usuario (autenticado o anónimo).
-  * Nivel de acceso `private` es visible solo por usuarios autenticados (`auth.role() = 'authenticated'`).
-  * Los administradores pueden ver todos los niveles de acceso (incluyendo `hidden`).
-* **Escritura (INSERT/UPDATE/DELETE)**: Permitida única y exclusivamente a usuarios administradores.
+* **Lectura (SELECT)**: Evaluado mediante la función `public.user_has_hymn_access(id)`. Permite ver el himno si es público, si tiene permiso individual explícito, o si el usuario pertenece al grupo asociado al himno.
+* **Escritura (INSERT/UPDATE/DELETE)**: Permitida a administradores o al usuario creador (`created_by = auth.uid()`).
 
 ### 4. `groups`
 * **Lectura (SELECT)**: Visible para administradores, creadores del grupo (`created_by = auth.uid()`) o si el usuario autenticado pertenece a los miembros del grupo (`public.is_group_member(id)`).
@@ -103,19 +114,20 @@ Todas las tablas y buckets tienen habilitado RLS para garantizar la integridad y
 * **Modificación (ALL)**: Permitido para administradores o el creador del registro.
 
 ### 7. `hymn_category`
-* **Lectura (SELECT)**: Visible si el usuario tiene acceso al menos al himno en cuestión.
-* **Escritura (INSERT/DELETE)**: Permitido para administradores, o para usuarios con rol `special` en las categorías globales o asociadas a sus grupos.
+* **Lectura (SELECT)**: Visible si el usuario tiene acceso de lectura al himno en cuestión (`public.user_has_hymn_access(hymn_id)`).
+* **Escritura (INSERT/DELETE)**: Evaluado mediante `public.user_can_manage_hymn(hymn_id)` y requiriendo que la categoría pertenezca a un grupo propio. Esto evita que miembros pasivos de otros grupos re-compartan himnos ajenos.
 
 ### 8. Storage: Bucket `'hymns'`
-* **Lectura (SELECT)**:
-  * Archivos de himnos con `access_level = 'public'` son visibles de manera pública.
-  * Archivos de himnos públicos y privados son visibles para usuarios autenticados.
-  * Administradores tienen acceso total a todos los archivos.
-* **Escritura (INSERT/UPDATE/DELETE)**: Restringido únicamente al rol de administrador.
+* **Lectura (SELECT)**: Evaluado dinámicamente mediante `public.user_has_hymn_access()`.
+* **Escritura (INSERT/UPDATE/DELETE)**: Restringido únicamente al rol de administrador o creador del himno.
 
-### 9. `profiles`
+### 9. `hymn_user_permissions`
+* **Lectura (SELECT)**: Visible para administradores o si el registro corresponde al propio usuario (`user_id = auth.uid()`).
+* **Escritura (ALL)**: Permitido únicamente para administradores.
+
+### 10. `profiles`
 * **Lectura (SELECT)**: Los usuarios pueden leer perfiles públicos o la lógica del sistema lee el perfil del usuario autenticado.
-* **Modificación (UPDATE)**: Permitido para que cualquier usuario autenticado modifique únicamente su propio perfil (por ejemplo, para cambiar su voz por defecto):
+* **Modificación (UPDATE)**: Permitido para que cualquier usuario autenticado modifique únicamente su propio perfil:
   ```sql
   CREATE POLICY "Usuario modifica su propia voz"
   ON public.profiles
@@ -158,6 +170,107 @@ BEGIN
     SELECT 1 FROM public.group_members 
     WHERE group_id = group_id_param AND user_id = auth.uid()
   );
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
+```
+
+### Función `public.user_has_hymn_access(hymn_id_param INT)`
+Evalúa si el usuario actual posee derechos de **lectura / reproducción** sobre un himno según los 3 niveles de acceso.
+```sql
+CREATE OR REPLACE FUNCTION public.user_has_hymn_access(hymn_id_param INT)
+RETURNS BOOLEAN AS $$
+BEGIN
+    -- Nivel Admin: Acceso total
+    IF public.get_current_user_role() = 'admin' THEN
+        RETURN TRUE;
+    END IF;
+
+    -- Nivel 1: Himno Público (visible para todos, incluidos no autenticados)
+    IF EXISTS (
+        SELECT 1 FROM public.hymns
+        WHERE id = hymn_id_param AND access_level = 'public'
+    ) THEN
+        RETURN TRUE;
+    END IF;
+
+    -- Si no está autenticado, no tiene acceso
+    IF auth.uid() IS NULL THEN
+        RETURN FALSE;
+    END IF;
+
+    -- Nivel 2: Permiso Individual asignado explícitamente al usuario
+    IF EXISTS (
+        SELECT 1 FROM public.hymn_user_permissions
+        WHERE hymn_id = hymn_id_param AND user_id = auth.uid()
+    ) THEN
+        RETURN TRUE;
+    END IF;
+
+    -- Nivel 3a: Permiso por Grupo heredado a través de Categorías
+    IF EXISTS (
+        SELECT 1 
+        FROM public.hymn_category hc
+        JOIN public.categories c ON hc.category_id = c.id
+        JOIN public.group_members gm ON c.group_id = gm.group_id
+        WHERE hc.hymn_id = hymn_id_param 
+          AND gm.user_id = auth.uid()
+    ) THEN
+        RETURN TRUE;
+    END IF;
+
+    -- Nivel 3b: Categorías de tipo global
+    IF EXISTS (
+        SELECT 1 
+        FROM public.hymn_category hc
+        JOIN public.categories c ON hc.category_id = c.id
+        WHERE hc.hymn_id = hymn_id_param 
+          AND c.type = 'global'
+    ) THEN
+        RETURN TRUE;
+    END IF;
+
+    RETURN FALSE;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
+```
+
+### Función `public.user_can_manage_hymn(hymn_id_param INT)`
+Evalúa si el usuario actual posee derechos de **gestión / vinculación / compartir** sobre un himno.
+```sql
+CREATE OR REPLACE FUNCTION public.user_can_manage_hymn(hymn_id_param INT)
+RETURNS BOOLEAN AS $$
+BEGIN
+    -- 1. Admins tienen control total
+    IF public.get_current_user_role() = 'admin' THEN
+        RETURN TRUE;
+    END IF;
+
+    -- 2. Himnos Públicos: Cualquier usuario autenticado puede vincularlo a sus categorías de grupo
+    IF EXISTS (
+        SELECT 1 FROM public.hymns
+        WHERE id = hymn_id_param AND access_level = 'public'
+    ) THEN
+        RETURN TRUE;
+    END IF;
+
+    -- 3. Creador original del himno
+    IF EXISTS (
+        SELECT 1 FROM public.hymns
+        WHERE id = hymn_id_param AND created_by = auth.uid()
+    ) THEN
+        RETURN TRUE;
+    END IF;
+
+    -- 4. Acceso Individual explícito (Nivel 2): Poseer registro en hymn_user_permissions otorga derecho a compartir
+    IF EXISTS (
+        SELECT 1 FROM public.hymn_user_permissions
+        WHERE hymn_id = hymn_id_param AND user_id = auth.uid()
+    ) THEN
+        RETURN TRUE;
+    END IF;
+
+    -- Acceso pasivo por grupo (Nivel 3) NO otorga derecho a re-compartir
+    RETURN FALSE;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 ```
