@@ -1,5 +1,6 @@
 import { initHomeView } from "./ui/homeView.js";
 import { initProfileView } from "./ui/profileView.js";
+import { initPlaylistsView } from "./ui/playlistsView.js";
 
 // Cache de las vistas para no hacer fetch múltiples veces
 const viewsCache = {};
@@ -52,7 +53,7 @@ export async function handleRouteChange(session, role, forceReload = false) {
   }
 
   // Guardianes de Ruta (Route Guards)
-  if (path === 'perfil' && !session) {
+  if ((path === 'perfil' || path === 'playlists') && !session) {
     window.location.hash = '#/home';
     return;
   }
@@ -71,6 +72,10 @@ export async function handleRouteChange(session, role, forceReload = false) {
     case 'perfil':
       viewLoaded = await loadView('profile');
       if (viewLoaded) initProfileView(session, role);
+      break;
+    case 'playlists':
+      viewLoaded = await loadView('playlists');
+      if (viewLoaded) initPlaylistsView();
       break;
     case 'admin':
       viewLoaded = await loadView('admin');

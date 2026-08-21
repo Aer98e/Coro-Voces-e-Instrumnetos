@@ -271,6 +271,72 @@ export async function obtenerPermisosHimno(hymnId) {
   }
 }
 
+/**
+ * Obtiene la URL firmada del archivo de audio para un himno y una voz específica (o voz por defecto/disponible)
+ * @param {number} hymnId 
+ * @param {number|null} voiceId 
+ * @returns {Promise<string>}
+ */
+export async function obtenerRutaAudioHimno(hymnId, voiceId = null) {
+  try {
+    let targetVoiceId = voiceId;
+
+    // Si no se especificó voz, intentar obtener la voz por defecto del usuario
+    if (!targetVoiceId) {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const userId = sessionData?.session?.user?.id;
+      if (userId) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("defauld_voice_id")
+          .eq("id", userId)
+          .single();
+
+        if (profile?.defauld_voice_id) {
+          targetVoiceId = profile.defauld_voice_id;
+        }
+      }
+    }
+
+    let audioPath = null;
+
+    // Buscar relación para la voz específica
+    if (targetVoiceId) {
+      const { data: voiceRel } = await supabase
+        .from("hymn_voice")
+        .select("audio_url")
+        .eq("hymn_id", hymnId)
+        .eq("voice_id", targetVoiceId)
+        .single();
+
+      if (voiceRel?.audio_url) {
+        audioPath = voiceRel.audio_url;
+      }
+    }
+
+    // Fallback: Si no hay audio para esa voz, buscar el primer audio disponible para el himno
+    if (!audioPath) {
+      const { data: anyRel } = await supabase
+        .from("hymn_voice")
+        .select("audio_url")
+        .eq("hymn_id", hymnId)
+        .not("audio_url", "is", null)
+        .limit(1);
+
+      if (anyRel && anyRel.length > 0) {
+        audioPath = anyRel[0].audio_url;
+      }
+    }
+
+    if (!audioPath) return "";
+
+    return await generarURLFirmada(audioPath, 1800);
+  } catch (error) {
+    console.error(`❌ Error obteniendo audio para himno ${hymnId}:`, error);
+    return "";
+  }
+}
+
 export default {
   cargarHimnos,
   cargarCategoriasUnicas,
@@ -278,6 +344,8 @@ export default {
   cargarVoces,
   asignarPermisoUsuario,
   removerPermisoUsuario,
-  obtenerPermisosHimno
+  obtenerPermisosHimno,
+  obtenerRutaAudioHimno
 };
+
 

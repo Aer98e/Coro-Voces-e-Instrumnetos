@@ -120,6 +120,7 @@ function actualizarHeaderUI(user, role) {
           </div>
           <hr class="dropdown-divider">
           ${adminLink}
+          <a href="#/playlists" class="dropdown-item">🎵 Playlists</a>
           <a href="#/perfil" class="dropdown-item">Mi Perfil</a>
           <button id="btn-logout" class="dropdown-item text-danger">Cerrar sesión</button>
         </div>

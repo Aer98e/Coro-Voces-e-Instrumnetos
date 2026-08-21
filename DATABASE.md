@@ -21,7 +21,7 @@ Registros de los himnos del repertorio.
 * **hymn_key**: `text` (Permite nulos)
 * **register**: `date` (Permite nulos)
 * **version_name**: `text` (Permite nulos)
-* **access_level**: `text` (Permite nulos, ej: `'public'`, `'individual'`, `'restricted'`)
+* **access_level**: `text` (Permite nulos, ej: `'public'`, `'private'`, `'hidden'`)
 * **created_by**: `uuid` (Permite nulos, Llave Foránea a `profiles(id)`, usuario creador/propietario del himno)
 
 ### `voices`
@@ -71,7 +71,27 @@ Tabla mediadora para permisos individuales asignados explícitamente a un usuari
 * **granted_by**: `uuid` (Permite nulos, Llave Foránea a `profiles`)
 * **created_at**: `timestamp with time zone` (Valor por defecto: `now()`)
 
+### `playlists`
+Listas de reproducción personalizadas y comunitarias creadas por los usuarios.
+* **id**: `integer` (No nulo, Llave Primaria, autoincrementable)
+* **name**: `text` (No nulo, nombre de la lista)
+* **description**: `text` (Permite nulos)
+* **access_level**: `text` (No nulo, valor por defecto: `'private'`, valores: `'public'`, `'private'`)
+* **created_by**: `uuid` (No nulo, Llave Foránea a `profiles(id)`)
+* **created_at**: `timestamp with time zone` (Valor por defecto: `now()`)
+
+### `playlist_hymns`
+Tabla mediadora que asocia himnos a una lista de reproducción con orden, repeticiones y voz personalizada.
+* **id**: `integer` (No nulo, Llave Primaria, autoincrementable)
+* **playlist_id**: `integer` (No nulo, Llave Foránea a `playlists(id)` con `ON DELETE CASCADE`)
+* **hymn_id**: `integer` (No nulo, Llave Foránea a `hymns(id)` con `ON DELETE CASCADE`)
+* **position**: `integer` (No nulo, orden del himno en la lista, valor por defecto: `1`)
+* **repeat_count**: `integer` (No nulo, repeticiones individuales para el himno, valor por defecto: `1`)
+* **voice_id**: `integer` (Permite nulos, Llave Foránea a `voices(id)`)
+* **created_at**: `timestamp with time zone` (Valor por defecto: `now()`)
+
 ---
+
 
 ## 🔐 Políticas de Seguridad de Fila (RLS)
 
