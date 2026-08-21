@@ -129,15 +129,29 @@ export function renderizarResultados(lista, defaultVoice) {
   const panelResultados = document.querySelector(".results-panel");
   if (!panelResultados) return;
 
-  panelResultados.innerHTML = `<h2 class="${CONSTANTS.CSS_CLASSES.SECTION_TITLE}">Resultados</h2>`;
+  let listContainer = panelResultados.querySelector(".results-list");
+  if (!listContainer) {
+    panelResultados.innerHTML = `
+      <div class="results-header">
+        <h2 class="${CONSTANTS.CSS_CLASSES.SECTION_TITLE}">Resultados</h2>
+        <button type="button" id="btn-play-filtered-results" class="btn btn-play-category hidden" title="Reproducir todos los resultados que estás viendo">
+          ▶️ Reproducir lista
+        </button>
+      </div>
+      <div class="results-list"></div>
+    `;
+    listContainer = panelResultados.querySelector(".results-list");
+  }
 
+  listContainer.innerHTML = "";
   const fragmento = document.createDocumentFragment();
 
   if (lista.length === 0) {
     const mensaje = document.createElement("p");
+    mensaje.className = "loading-message";
     mensaje.textContent = "No se encontraron himnos.";
     fragmento.appendChild(mensaje);
-    panelResultados.appendChild(fragmento);
+    listContainer.appendChild(fragmento);
     return;
   }
 
@@ -146,7 +160,7 @@ export function renderizarResultados(lista, defaultVoice) {
     fragmento.appendChild(tarjeta);
   });
 
-  panelResultados.appendChild(fragmento);
+  listContainer.appendChild(fragmento);
 }
 
 export default {

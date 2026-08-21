@@ -7,6 +7,9 @@
 
 import { obtenerRutaAudioHimno } from "../../services/hymnService.js";
 
+const savedVolume = parseFloat(localStorage.getItem("app_audio_volume") ?? "1");
+const savedMuted = localStorage.getItem("app_audio_muted") === "true";
+
 let state = {
   playlist: null,
   currentIndex: 0,
@@ -14,7 +17,10 @@ let state = {
   loopMode: 'off', // 'off' | 'all' | 'one'
   isPlaying: false,
   isLoading: false,
-  isDraggingProgress: false
+  isDraggingProgress: false,
+  volume: isNaN(savedVolume) ? 1 : savedVolume,
+  isMuted: savedMuted,
+  isMinimized: false
 };
 
 let audioElement = null;
@@ -31,6 +37,8 @@ function getOrCreateAudioElement() {
   if (!audioElement) {
     audioElement = document.createElement("audio");
     audioElement.preload = "auto";
+    audioElement.volume = state.volume;
+    audioElement.muted = state.isMuted;
 
     audioElement.addEventListener("play", () => {
       state.isPlaying = true;
@@ -95,8 +103,17 @@ function getOrCreatePlayerBar() {
           <button id="btn-player-next" class="player-btn" title="Siguiente pista">⏭️</button>
         </div>
 
-        <!-- Botón de Cerrar -->
-        <button id="btn-player-close" class="player-btn-close" title="Cerrar Reproductor">&times;</button>
+        <!-- Control de Volumen -->
+        <div class="player-volume-group">
+          <button id="btn-player-volume" class="player-btn btn-volume-toggle" title="Silenciar / Activar sonido">🔊</button>
+          <input type="range" id="player-volume-slider" class="player-volume-slider" min="0" max="1" step="0.01" value="1" title="Ajustar volumen">
+        </div>
+
+        <!-- Botones de Acción de Ventana (Minimizar / Cerrar) -->
+        <div class="player-window-actions">
+          <button id="btn-player-minimize" class="player-btn-action" title="Minimizar reproductor">🔽</button>
+          <button id="btn-player-close" class="player-btn-close" title="Cerrar Reproductor">&times;</button>
+        </div>
       </div>
     `;
 
@@ -128,6 +145,42 @@ function getOrCreatePlayerBar() {
     progressBar?.addEventListener("mouseup", () => { state.isDraggingProgress = false; });
     progressBar?.addEventListener("touchend", () => { state.isDraggingProgress = false; });
 
+    // Eventos de Volumen
+    const volumeSlider = playerBarContainer.querySelector("#player-volume-slider");
+    const volumeBtn = playerBarContainer.querySelector("#btn-player-volume");
+
+    if (volumeSlider) {
+      volumeSlider.value = state.isMuted ? 0 : state.volume;
+      volumeSlider.addEventListener("input", (e) => {
+        const val = parseFloat(e.target.value);
+        state.volume = val;
+        state.isMuted = val === 0;
+        const audio = getOrCreateAudioElement();
+        audio.volume = val;
+        audio.muted = state.isMuted;
+        localStorage.setItem("app_audio_volume", val);
+        localStorage.setItem("app_audio_muted", state.isMuted);
+        actualizarVolumenUI();
+      });
+    }
+
+    if (volumeBtn) {
+      volumeBtn.addEventListener("click", () => {
+        state.isMuted = !state.isMuted;
+        const audio = getOrCreateAudioElement();
+        audio.muted = state.isMuted;
+        localStorage.setItem("app_audio_muted", state.isMuted);
+        actualizarVolumenUI();
+      });
+    }
+
+    playerBarContainer.querySelector(".player-track-info")?.addEventListener("click", () => {
+      if (state.isMinimized) {
+        toggleMinimizar();
+      }
+    });
+
+    playerBarContainer.querySelector("#btn-player-minimize")?.addEventListener("click", toggleMinimizar);
     playerBarContainer.querySelector("#btn-player-loop")?.addEventListener("click", toggleBucle);
     playerBarContainer.querySelector("#btn-player-prev")?.addEventListener("click", anteriorPista);
     playerBarContainer.querySelector("#btn-player-rewind")?.addEventListener("click", retroceder10Segundos);
@@ -135,6 +188,9 @@ function getOrCreatePlayerBar() {
     playerBarContainer.querySelector("#btn-player-forward")?.addEventListener("click", adelantar10Segundos);
     playerBarContainer.querySelector("#btn-player-next")?.addEventListener("click", siguientePista);
     playerBarContainer.querySelector("#btn-player-close")?.addEventListener("click", cerrarReproductor);
+
+    actualizarVolumenUI();
+    actualizarMinimizarUI();
   }
   return playerBarContainer;
 }
@@ -369,6 +425,30 @@ function actualizarBotonBucleUI() {
   }
 }
 
+export function toggleMinimizar() {
+  state.isMinimized = !state.isMinimized;
+  actualizarMinimizarUI();
+}
+
+function actualizarMinimizarUI() {
+  if (!playerBarContainer) return;
+  const minimizeBtn = playerBarContainer.querySelector("#btn-player-minimize");
+
+  if (state.isMinimized) {
+    playerBarContainer.classList.add("minimized");
+    if (minimizeBtn) {
+      minimizeBtn.innerHTML = "🔼";
+      minimizeBtn.title = "Expandir reproductor";
+    }
+  } else {
+    playerBarContainer.classList.remove("minimized");
+    if (minimizeBtn) {
+      minimizeBtn.innerHTML = "🔽";
+      minimizeBtn.title = "Minimizar reproductor";
+    }
+  }
+}
+
 function actualizarInfoUI() {
   const container = getOrCreatePlayerBar();
   if (!state.playlist) {
@@ -387,6 +467,31 @@ function actualizarInfoUI() {
   actualizarEstadoTexto(`Pista ${state.currentIndex + 1} de ${totalItems} • Repetición ${state.currentRepetition} de ${item.repeat_count} (${item.voice_name})`);
   actualizarBotonPlayPausaUI();
   actualizarBotonBucleUI();
+  actualizarVolumenUI();
+  actualizarMinimizarUI();
+}
+
+function actualizarVolumenUI() {
+  if (!playerBarContainer) return;
+  const volumeBtn = playerBarContainer.querySelector("#btn-player-volume");
+  const volumeSlider = playerBarContainer.querySelector("#player-volume-slider");
+
+  if (volumeSlider) {
+    volumeSlider.value = state.isMuted ? 0 : state.volume;
+  }
+
+  if (volumeBtn) {
+    if (state.isMuted || state.volume === 0) {
+      volumeBtn.innerHTML = "🔇";
+      volumeBtn.title = "Activar sonido";
+    } else if (state.volume < 0.5) {
+      volumeBtn.innerHTML = "🔉";
+      volumeBtn.title = "Silenciar";
+    } else {
+      volumeBtn.innerHTML = "🔊";
+      volumeBtn.title = "Silenciar";
+    }
+  }
 }
 
 function actualizarProgresoUI() {
@@ -418,5 +523,6 @@ export default {
   siguientePista,
   anteriorPista,
   toggleBucle,
+  toggleMinimizar,
   cerrarReproductor
 };

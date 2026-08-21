@@ -89,7 +89,7 @@ export async function handleRouteChange(session, role, forceReload = false) {
     case 'home':
     default:
       viewLoaded = await loadView('home');
-      if (viewLoaded) initHomeView();
+      if (viewLoaded) initHomeView(session);
       break;
   }
 }
