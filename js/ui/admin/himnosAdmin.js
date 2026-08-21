@@ -306,10 +306,10 @@ function filterAndRenderHymnsTable() {
       const level = h.access_level || 'public';
       if (accessFilter === 'public') {
         return level === 'public';
-      } else if (accessFilter === 'individual') {
-        return level === 'individual' || level === 'private';
-      } else if (accessFilter === 'restricted') {
-        return level === 'restricted' || level === 'hidden';
+      } else if (accessFilter === 'private') {
+        return level === 'private' || level === 'individual';
+      } else if (accessFilter === 'hidden') {
+        return level === 'hidden' || level === 'restricted';
       }
       return level === accessFilter;
     });
@@ -354,10 +354,10 @@ function filterAndRenderHymnsTable() {
 
     const accessBadge = h.access_level === 'public'
       ? `<span class="badge badge-global" style="color:initial;">Público</span>`
-      : (h.access_level === 'individual'
-        ? `<span class="badge badge-voice" style="color:initial;">Individual</span>`
-        : (h.access_level === 'restricted'
-          ? `<span class="badge badge-category" style="color:initial;">Grupo</span>`
+      : (h.access_level === 'private' || h.access_level === 'individual'
+        ? `<span class="badge badge-voice" style="color:initial;">Privado</span>`
+        : (h.access_level === 'hidden' || h.access_level === 'restricted'
+          ? `<span class="badge badge-group" style="color:initial;">Oculto</span>`
           : `<span class="badge badge-voice-p" style="color:initial;">${h.access_level || 'Privado'}</span>`));
 
     return `
@@ -707,7 +707,11 @@ async function openEditHymnModal(e) {
     document.getElementById("edit-hymn-title").value = hymn.title || "";
     document.getElementById("edit-hymn-key").value = hymn.hymn_key || "";
     document.getElementById("edit-hymn-version").value = hymn.version_name || "";
-    document.getElementById("edit-hymn-access").value = hymn.access_level || "public";
+
+    let currentAccess = hymn.access_level || "public";
+    if (currentAccess === "individual") currentAccess = "private";
+    if (currentAccess === "restricted") currentAccess = "hidden";
+    document.getElementById("edit-hymn-access").value = currentAccess;
 
     const { data: voiceLinks, error: linksError } = await supabase
       .from("hymn_voice")

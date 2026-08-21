@@ -21,8 +21,8 @@
         <select id="hymns-filter-access" class="select-input" style="margin: 0; width: 100%; height: 42px;">
           <option value="all" selected>🌐 Todos los accesos</option>
           <option value="public">Público</option>
-          <option value="individual">Individual / Privado</option>
-          <option value="restricted">Por Grupo / Oculto</option>
+          <option value="private">Privado</option>
+          <option value="hidden">Oculto</option>
         </select>
       </div>
     </div>
@@ -81,9 +81,9 @@
           <div style="flex: 1; min-width: 130px;">
             <label class="field-label" for="hymn-access">Nivel de Acceso</label>
             <select id="hymn-access" class="select-input" required>
-              <option value="public" selected>Acceso Público (Cualquier persona)</option>
-              <option value="individual">Acceso Individual (Por usuario específico)</option>
-              <option value="restricted">Acceso por Grupo (Por categoría de grupo)</option>
+              <option value="public" selected>Público</option>
+              <option value="private">Privado</option>
+              <option value="hidden">Oculto</option>
             </select>
           </div>
         </div>
@@ -140,9 +140,9 @@
         <div style="flex: 1; min-width: 130px;">
           <label class="field-label" for="edit-hymn-access">Acceso</label>
           <select id="edit-hymn-access" class="select-input" required>
-            <option value="public">Acceso Público</option>
-            <option value="individual">Acceso Individual</option>
-            <option value="restricted">Acceso por Grupo</option>
+            <option value="public">Público</option>
+            <option value="private">Privado</option>
+            <option value="hidden">Oculto</option>
           </select>
         </div>
       </div>
