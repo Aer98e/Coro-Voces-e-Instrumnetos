@@ -1,0 +1,195 @@
+<div class="view-content view-playlists fade-in" style="max-width: 1100px; margin: 0 auto; padding: 1.5rem 1rem;">
+
+  <!-- ENCABEZADO PRINCIPAL -->
+  <div style="margin-bottom: 1.5rem;">
+    <h2 class="section-title" style="margin: 0;">Listas de Reproducción</h2>
+    <p style="color: #64748b; margin: 0.25rem 0 0; font-size: 0.95rem;">
+      Crea secuencias personalizadas con repeticiones para ensayar, o explora listas de la comunidad.
+    </p>
+  </div>
+
+  <!-- PESTAÑAS PRINCIPALES -->
+  <div class="playlist-tabs">
+    <button type="button" id="tab-btn-my-playlists" class="playlist-tab-btn active">
+      🎵 Mis Playlists
+    </button>
+    <button type="button" id="tab-btn-community" class="playlist-tab-btn">
+      🌐 Explorar Comunidad
+    </button>
+  </div>
+
+  <!-- SECCIÓN 1: MIS PLAYLISTS -->
+  <div id="section-my-playlists">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
+      <h3 style="margin:0; font-size: 1.1rem; color: #1e293b;">Tus Listas de Ensayo</h3>
+      <button type="button" id="btn-open-create-playlist" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 0.4rem; font-weight: 600; height: 40px;">
+        ➕ Crear Nueva Lista
+      </button>
+    </div>
+
+    <div id="my-playlists-grid" class="playlists-grid">
+      <p style="grid-column: 1/-1; text-align: center; color: #64748b; padding: 2rem 0;">Cargando tus listas de reproducción...</p>
+    </div>
+  </div>
+
+  <!-- SECCIÓN 2: EXPLORAR COMUNIDAD (Oculto por defecto) -->
+  <div id="section-community-playlists" class="hidden">
+    <div style="margin-bottom: 1.25rem;">
+      <input type="text" id="community-search-input" class="search-input" placeholder="🔍 Buscar listas públicas por nombre..." autocomplete="off" style="margin: 0; width: 100%; max-width: 450px;">
+    </div>
+
+    <div id="community-playlists-grid" class="playlists-grid">
+      <p style="grid-column: 1/-1; text-align: center; color: #64748b; padding: 2rem 0;">Cargando listas de la comunidad...</p>
+    </div>
+  </div>
+
+  <!-- SUB-VISTA: DETALLE Y EDICIÓN DE UNA PLAYLIST (Oculto por defecto) -->
+  <div id="section-playlist-detail" class="hidden">
+    <button type="button" id="btn-back-to-playlists" class="btn btn-ghost btn-sm" style="display: inline-flex; align-items: center; gap: 0.4rem; font-weight: 600; margin-bottom: 1rem;">
+      ← Volver a Listas
+    </button>
+
+    <div class="admin-card" style="margin-bottom: 1.5rem;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 1rem; margin-bottom: 1rem;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+            <h2 id="detail-playlist-name" class="section-title" style="margin: 0;">Nombre de Lista</h2>
+            <button type="button" id="btn-quick-edit-playlist-title" class="btn-icon hidden" title="Editar Nombre y Descripción" style="font-size: 1.1rem; padding: 0.2rem; cursor: pointer;">✏️</button>
+            <span id="detail-playlist-badge" class="badge badge-global">Pública</span>
+          </div>
+          <p id="detail-playlist-desc" style="color: #64748b; margin: 0.35rem 0 0; font-size: 0.9rem;">Descripción de la lista</p>
+          <span id="detail-playlist-author" style="font-size: 0.8rem; color: #94a3b8; display: block; margin-top: 0.25rem;">Creado por: Usuario</span>
+        </div>
+
+        <div class="playlist-detail-actions-group">
+          <!-- Botón de Reproducir Continuo -->
+          <button type="button" id="btn-play-full-playlist" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 0.4rem; font-weight: 600; height: 40px;">
+            ▶️ Reproducir Lista Completa
+          </button>
+          
+          <!-- Botón de Guardar Copia (para listas ajenas) -->
+          <button type="button" id="btn-copy-community-playlist" class="btn btn-secondary hidden" style="display: inline-flex; align-items: center; gap: 0.4rem; font-weight: 600; height: 40px;">
+            📋 Guardar una Copia Editable
+          </button>
+
+          <!-- Controles de Edición (solo para propietario) -->
+          <div id="owner-playlist-actions" class="owner-actions-flex">
+            <button type="button" id="btn-open-edit-playlist-modal" class="btn btn-ghost btn-sm" title="Editar nombre y descripción de la lista">
+              ✏️ Editar Nombre
+            </button>
+            <button type="button" id="btn-toggle-playlist-privacy" class="btn btn-ghost btn-sm" title="Cambiar privacidad de lista">
+              🔒/🌐 Cambiar Privacidad
+            </button>
+            <button type="button" id="btn-open-add-hymn-modal" class="btn btn-secondary btn-sm" style="font-weight: 600;">
+              ➕ Agregar Himno
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- LISTA REORDENABLE DE HIMNOS -->
+      <div>
+        <h4 style="margin: 0 0 0.75rem; font-size: 0.95rem; color: #475569; display: flex; justify-content: space-between; align-items: center;">
+          <span>Himnos en la Lista</span>
+          <span id="detail-playlist-count" style="font-weight: normal; color: #64748b; font-size: 0.85rem;">0 Himnos</span>
+        </h4>
+
+        <div id="playlist-items-container" class="playlist-items-list">
+          <p style="text-align: center; color: #64748b; padding: 1.5rem 0;">Esta lista no tiene himnos agregados aún.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- MODAL: CREAR / EDITAR METADATOS DE PLAYLIST -->
+<div id="playlist-modal" class="modal-overlay hidden">
+  <div class="login-card" style="max-width: 500px; width: 95%; padding: 1.75rem;">
+    <button type="button" id="btn-close-playlist-modal" class="modal-close-btn">&times;</button>
+    <h3 id="playlist-modal-title" class="modal-title-login" style="margin-bottom: 0.5rem;">Crear Nueva Lista</h3>
+    
+    <form id="playlist-form">
+      <input type="hidden" id="playlist-modal-id">
+
+      <div style="margin-bottom: 1rem;">
+        <label class="field-label" for="playlist-input-name">Nombre de la Lista</label>
+        <input type="text" id="playlist-input-name" class="search-input" placeholder="Ej. Himnos para Culto Dominical" required style="width: 100%;">
+      </div>
+
+      <div style="margin-bottom: 1rem;">
+        <label class="field-label" for="playlist-input-desc">Descripción (Opcional)</label>
+        <textarea id="playlist-input-desc" class="search-input" placeholder="Ej. Lista de ensayo para tenores y sopranos" rows="3" style="width: 100%; resize: vertical;"></textarea>
+      </div>
+
+      <div style="margin-bottom: 1.5rem;">
+        <label class="field-label" for="playlist-input-access">Visibilidad</label>
+        <select id="playlist-input-access" class="select-input" style="width: 100%;">
+          <option value="private" selected>🔒 Privada (Solo accesible por ti)</option>
+          <option value="public">🌐 Pública (Visible para la comunidad)</option>
+        </select>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+        <button type="button" id="btn-cancel-playlist-modal" class="btn btn-ghost">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Guardar Lista</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- MODAL: GESTIONAR Y VINCULAR HIMNOS DE LA PLAYLIST -->
+<div id="add-hymn-to-playlist-modal" class="modal-overlay hidden">
+  <div class="login-card" style="max-width: 850px; width: 95%; padding: 1.75rem;">
+    <button type="button" id="btn-close-add-hymn-modal" class="modal-close-btn">&times;</button>
+    <h3 class="modal-title-login" style="margin-bottom: 0.25rem;">Gestionar Himnos de la Lista</h3>
+    <p style="color: #64748b; font-size: 0.85rem; margin-bottom: 1rem;">Agrega o quita himnos en tiempo real. La ventana permanecerá abierta hasta que termines.</p>
+
+    <!-- Buscador en tiempo real -->
+    <div style="margin-bottom: 1rem;">
+      <input type="text" id="playlist-linking-search-input" class="search-input" placeholder="🔍 Filtrar himnos por número o título..." autocomplete="off" style="margin: 0; width: 100%;">
+    </div>
+
+    <!-- Pestañas Móviles (pantallas chicas < 768px) -->
+    <div class="linking-mobile-tabs" id="playlist-linking-mobile-tabs">
+      <button type="button" class="linking-tab-btn active" data-tab="added">
+        ✅ En la Playlist (<span id="playlist-mobile-count-added">0</span>)
+      </button>
+      <button type="button" class="linking-tab-btn" data-tab="available">
+        ➕ Disponibles (<span id="playlist-mobile-count-available">0</span>)
+      </button>
+    </div>
+
+    <!-- Contenedor en 2 Columnas (En la Lista | Disponibles) -->
+    <div class="hymns-columns-grid">
+      <!-- Columna 1: En la Playlist -->
+      <div class="linking-column linking-column-linked active-mobile-col" id="playlist-col-added-wrapper">
+        <div class="linking-column-header">
+          <h4 class="linking-column-title">✅ En la Playlist</h4>
+          <span class="badge badge-category" id="playlist-badge-count-added">0 Himnos</span>
+        </div>
+        <div id="playlist-added-hymns-list" class="linking-items-list">
+          <p class="loading-message">Cargando himnos en la lista...</p>
+        </div>
+      </div>
+
+      <!-- Columna 2: Himnos Disponibles -->
+      <div class="linking-column linking-column-available" id="playlist-col-available-wrapper">
+        <div class="linking-column-header">
+          <h4 class="linking-column-title">➕ Disponibles para Agregar</h4>
+          <span class="badge badge-global" id="playlist-badge-count-available">0 Himnos</span>
+        </div>
+        <div id="playlist-available-hymns-list" class="linking-items-list">
+          <p class="loading-message">Cargando himnos disponibles...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pie del Modal -->
+    <div style="display: flex; justify-content: flex-end; margin-top: 1.25rem;">
+      <button type="button" id="btn-done-add-hymn-modal" class="btn btn-primary" style="font-weight: 600;">
+        ✓ Listo / Finalizar
+      </button>
+    </div>
+  </div>
+</div>
